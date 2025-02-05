@@ -1,0 +1,555 @@
+---
+title: "Data Wrangling Assessment Task 3: Dataset challenge"
+author: "Timm Rahrt"
+subtitle: 
+output: 
+  html_document:
+    df_print: paged
+  word_document: default
+  pdf: default
+---
+<h2>0. Setup</h2>
+
+This Assessment deals with five different datasets of the website `data.ct.gov` _(Ct Data, 2024)_. The primary focus is to answer how to ensure all datasets, with varying structures and format, are transformed into a unified, analysable format, following the Data Wrangling Preprocessing steps.
+
+We will achieve this by:
+
+  1. Webscraping and merging multiple datasets from `data.ct.gov`
+  2. Checking and applying Data Tidy Principles by _Wickham and Grolemund (2016)_
+  3. Handling missing, `Null` and misleading values
+  4. Standardising and mutating new variables to enhance the analysis
+  5. Visualizing and transforming the data
+
+Before we start, we load all necessary libraries:
+```{r, warning=FALSE, message=FALSE}
+# Un-commend if needed
+# install.packages('RSocrata')
+# Please load packages required for producing this report
+library(tidyverse) # Covers ggplot2, readr, tidyr, dplyr, etc 
+library(magrittr) # For piping
+library(RSocrata) # For webscraping
+library(lubridate) # For Date and Time conversion
+library(infotheo) # For discretisation techniques, here equal-depth binning
+# Seed for reproducibility
+set.seed(123)
+```
+
+<h2>1. Data Description</h2>
+<h3>1.1 Data Description Set 1</h3>
+The first dataset, accessed via an API using `read.socrata`, focuses on commercial information of different towns in Connecticut _(GitHub, 2024)_. Since the original dataset contains over 1 Million Rows, we apply an `slice_sample` on the complete dataset to extract 10000 randomly selected rows and store the result in `rows_df` _(Dplyr.tidyverse.org, 2024)_. We group by the variable `town` and ensure that only the first occurrence of each town is kept by using `slice(1)`. We `ungroup` this dataset to allow further manipulations to be applied to the entire dataset. Next, we rearrange the variable order by calling `select` and listing `town` before all (`everything`) other variables. Finally, we apply `-c()` with all irrelevant variable names as an `attribute`, to `drop`/delete them.
+
+Our finalised first dataset `sales_data` contains the variables:
+
+* town: Name of the Connecticut town the property is located
+* listyear: Year of the properties listing date
+* daterecorded: Date when the sale was recorded
+* assessedvalue: Assessed Value of the property
+* saleamount: Price at which the property was sold
+* salesratio: Ratio that compares sale price to assessed value
+* propertytype: Type of the Property
+* residentialtype: Type of the Residence
+
+```{r}
+url <- "https://data.ct.gov/resource/5mzw-sjtu.json" 
+complete_data <- read.socrata(url)
+# Select random rows once
+rows_df <- complete_data %>% slice_sample(n = 10000)
+# Ensure town appears just once & drop unnecessary variables
+sales_data <- rows_df %>% 
+  group_by(town) %>% slice(1) %>% ungroup() %>% 
+  select(town, everything(), -c(serialnumber,nonusecode,geo_coordinates.type,geo_coordinates.coordinates,remarks,address,opm_remarks))
+# Display the first rows
+head(sales_data,5)
+```
+<h3>1.2 Data Description Set 2</h3>
+The next dataset contains information on *housing in various towns*. We apply the same webscraping technique as before using the `RSocrata` package and also rearrange the variables order, so that `town` comes first in our newly created dataset `affordable_housing`. Again, we group by `town` and only consider the first available entry using `slice(1)`. `-c()` is used like before, to drop all irrelevant variables.
+
+The finalised dataset `affordable_housing` contains the following variables:
+
+* town: Name of the town
+* X_2010_census: Population of the town 2010
+* gov_assisted: Number of government-assisted housing units
+* tenant_rental_assistance: Rental units receiving rental assistance
+* chfa_usda_mortgages: Housing units financed through CHFA (Connecticut Housing Finance Authority) or USDA (United States Department of Agriculture) mortgages
+* total_assisted: Total number of assisted housing units in the town.
+
+```{r}
+# Import dataset 2, webscrap the dataset using RSocrata
+url_2 <- "https://data.ct.gov/resource/3udy-56vi.json"
+affordable_housing <- read.socrata(url_2)
+# Adjust the dataset and display the first 5 rows
+affordable_housing %<>% group_by(town) %>% slice(1) %>% ungroup() %>% 
+  select(town, everything(), -c(year,code,percent_assisted,deed_restricted))
+head(affordable_housing,5)
+```
+<h3>1.3 Data Description Set 3</h3>
+After the import of the dataset, we save it as `housing_segregation` and `rename` the variable `sub_geography` to `town` as the values are the same as the previous `town` values of the other datasets. We will use `select` for the rearrangement of variables and delete the first twelve rows using `slice(c(1:12))` due to irrelevant entries _(Rdocumentation.org, 2018)_. We sort the dataframe by `town` in ascending order using `arrange` and display the first five observations using `head` on the dataframe. `housing_segragation` displays inequality in the years 2010, 2015 and 2020 across various towns, represented by the Gini Index. An index of `0` equals to perfect equality and `1` to maximal inequality.
+
+* town: Represents the town
+* gini_index_2010: The Gini Index for the year 2010
+* gini_index_2015: The Gini Index for the year 2015
+* gini_index_2020: The Gini Index for the year 2020
+
+```{r}
+# Load the third dataset
+url_3 <- "https://data.ct.gov/resource/5e73-kfqf.json"
+housing_segregation <- read.socrata(url_3)
+# Get rid of the first 12 double up rows, rearrange variables and sort by town
+housing_segregation %<>%
+  rename(town = sub_geography) %>% 
+  select(town, everything(),-geography) %>% slice(-c(1:12)) %>%  arrange(town)
+# Display the first 5 rows
+head(housing_segregation,5)
+```
+<h3>1.4 Data Description Set 4</h3>
+Our fourth dataset `housing_permits` contains information about the number of housing permits issued in various towns across different years. We need to `rename` towns to `town`, to guarantee equality in the variable name. 
+
+This dataset contains various columns like:
+
+* `town`: Name of the town
+* `X_1990` to `X_2022`: Number of housing permits issued in the year
+* `county`: Name of the county where the town is located
+
+We can see below that this dataset is in wide-format and, without further analysis, violates the Tidy Principle 1. and 2., as values form columns and not every row is one observation.
+
+```{r}
+# Load the fourth dataset as per previous technique
+url_4 <- "https://data.ct.gov/resource/stm9-38x4.json"
+housing_permits <- read.socrata(url_4)
+# Rearrange and drop observations
+housing_permits %<>% slice(-1) %>% rename(town = towns) %>% arrange(town)
+head(housing_permits,4)
+```
+To guarantee this dataset is compatible with the other datasets, we must perform some *tidying of the dataset*.`pivot_longer` changes the format from a wide to long format, where all columns starting with "X_" will be selected `cols = starts_with()` and moved to a new variable called year (`names_to = "year"`) _(R-Packages, 2024)_. `names_prefix` removes *"X_"* and finally, `values_to` moves all values to a new variable named `permits`.
+
+```{r}
+# Change the datasets wide format to long format
+housing_permits %<>% 
+  pivot_longer(cols = starts_with("X_"),
+               names_to = "year",
+               names_prefix = "X_",
+               values_to = "permits")
+head(housing_permits,3)
+```
+After successfully transforming the data into long format, we must ensure each town also just represents every `town` once. The below code groups the towns first, county second and performs a `summarise` function on them, which creates two new variables. `total_permits` represents the numerical sum `sum(as.numeric())` of all permits while disregarding all missing values (`na.rm=TRUE`). `peak_year` displays each towns year where the maximum permits were issued, using `which.max()`. We `ungroup` our dataset and `arrange` the `town` in ascending order.
+
+```{r}
+# Summarise and create new variables to dispaly unique town's
+housing_permits %<>% 
+  group_by(town, county) %>% 
+  summarise(total_permits = sum(as.numeric(permits), na.rm = TRUE),
+            peak_year = year[which.max(permits)]) %>% ungroup() %>% arrange(town)
+head(housing_permits,4)
+```
+<h3>1.5 Data Description Set 5</h3>
+The last dataset this reports includes contains information about various types of property net values in different towns. The variables are:
+
+* town_name: Name of the town
+* residential_net: Net value of residential properties
+* apartments_net: Net value of apartment properties
+* cip_net: Net value of commercial, industrial, and public properties
+* Net value of vacant properties
+* total_real_property
+
+It will also be webscraped using `RSocrata`. We save the data with relevant variables in a temporary variable `temp_df` and display the first two observations.
+
+```{r}
+# Webscrape data using RSocrata as before and select relevant variables
+url_5 <- "https://data.ct.gov/resource/8rr8-a322.json"
+temp_df <- read.socrata(url_5)
+temp_df <- temp_df[,c(2,4,7,10,13,22)]
+head(temp_df,2)
+```
+As we can see, we are experiencing a similar problem as before, the data is in wide format representing values as variables. To satisfy the `Data Tidying Principles`, we must again transform the dataset into long format using `pivot_longer`. We select all column names and store them in a new variable `type_property` using `names_to`. Like before, we store all values using `values_to` in a newly created variable `property_values`.
+
+```{r}
+# Change the datasets format from wide to long
+values_property <- temp_df %>% 
+  pivot_longer(c(residential_net,apartments_net,cip_net,vacant_net,total_real_property),
+               names_to = "type_property",
+               values_to = "property_value")
+head(values_property, 5)
+```
+As we end up being in the same situation as before, we `summarise` the `mean` of the numeric `property_value`, disregarding missing values, by `town_name`. We rename the variable `town_name` to `town` and display the newly created dataset `avg_property_value`.
+
+```{r}
+# Create a new variable `avg_property` to display every town just once
+avg_property_value <- values_property %>% 
+  group_by(town_name) %>% 
+  summarise(avg_property = mean(as.numeric(property_value), na.rm = TRUE)) %>% ungroup() %>% rename(town = town_name)
+head(avg_property_value,5)
+```
+After the creation of all dataset, we will now merge all datasets to one big dataframe. As the following `left_join` merges two datasets on a common variable, we must identify this variable using the `intersect` function on all five individual datasets _(dplyr.tidyverse.org, 2024)_.
+
+```{r}
+# Identify the common variable of all datasets
+common_var <- intersect(sales_data %>% names(), affordable_housing %>% names())
+common_var <- intersect(common_var, housing_segregation %>% names())
+common_var <- intersect(common_var, housing_permits %>% names())
+common_var <- intersect(common_var, avg_property_value %>% names())
+common_var
+```
+We can merge all datasets on the variable `town`.
+
+<h2>2. Understand</h2>
+<h3>2.1 Merging the datasets</h3>
+After webscraping and organising the datasets, we will merge them all together. Please note, the data is still untidy and we must also ensure that every variable is represented in their correct type. We join all four datasets together, called `connecticut_df`, using the `left_join` and the previously identified common variable `town`.
+
+```{r}
+# Join all datasets to one together
+connecticut_df <- sales_data %>% 
+  left_join(affordable_housing, by = 'town') %>% 
+  left_join(housing_segregation, by = 'town') %>% 
+  left_join(housing_permits, by = 'town') %>% 
+  left_join(avg_property_value, by = 'town')
+head(connecticut_df)
+```
+When inspecting our `connecticut_df`, it becomes obvious that the variables need clearer names. We display all names and their type using the `sapply` function, to gain an overview of their current names and types _(www.rdocumentation.org, 2024)_.
+
+```{r}
+# Display just variable names and type
+sapply(connecticut_df[0,],typeof)
+```
+The below code will change all variable names to a better, easier understandable version, saved in `new_var_names`. We save the old ones into `old_var_names` using `names`.
+
+```{r}
+new_var_names <- c("Towns","Listed Year","Recorded Date","Assessed Value","Sale Amount","Sale Ratio","Property Type","Residential Type","Census 2010","Gov. Assisted","Rental Assistance","Financed Units","Total Assisted","Gini 2010","Gini 2015","Gini 2020", "County","Total Permits","Peak Permit Year","Average Value")
+old_var_names <- names(connecticut_df)
+rename_ <- setNames(old_var_names,new_var_names)
+connecticut_df <- rename(connecticut_df, !!!rename_)
+colnames(connecticut_df)
+```
+We are using `!!!` in `rename` to pass the named vector as individual arguments to `rename` _(R-lib.org, 2024)_. As the name are better understandable now, we need to convert the variables in their correct format. We save all numeric variable of `connecticut_df` and call `vapply` method on them, which will iterate through every one of them applying `as.numeric`. `numeric(nrow())` ensures the output of this apply function are numerical variables. We have a look at the result using `glimpse`.
+
+```{r}
+# Type conversion numeric data
+numeric_var <- c("Assessed Value","Sale Amount","Sale Ratio","Census 2010","Gov. Assisted","Rental Assistance","Financed Units","Total Assisted","Gini 2010","Gini 2015","Gini 2020")
+connecticut_df[numeric_var] <- vapply(connecticut_df[numeric_var], as.numeric, numeric(nrow(connecticut_df)))
+glimpse(connecticut_df)
+```
+We can see, that more non-numerical variables need to be converted, such as `Recorded Date`. We convert he variable to a date format using the `lubridate` package _(Package ‘lubridate’ Type Package Title Make Dealing with Dates a Little Easier, 2020)_. `case_when` checks if the data can be converted using a specific format, if not, it applies an alternative format. `TRUE ~` ensures that the remaining cases, which didn't satisfy the conditions, are formatted as defined after the tilde `~ as.Date())`.
+
+```{r}
+# Date conversion
+connecticut_df %<>% mutate(`Recorded Date` = case_when(is.na(as.Date(`Recorded Date`, format = "%d %b %Y")) ~ as.Date(`Recorded Date`, format = "%d-%b-%Y"), TRUE ~ as.Date(`Recorded Date`, format = "%d %b %Y")))
+head(connecticut_df)
+```
+The last variables we need to adjust are `Proptery Type` and `Residential Type`, as they should be formatted as `factor` variables. We check their `unique` values to ensure the values are ideal for the factor conversion.
+
+```{r}
+# Label and level `Property Type` and `Residential Type`
+unique(connecticut_df$`Property Type`)
+unique(connecticut_df$`Residential Type`)
+```
+As the variables output a countable amount of unique values, we proceed with the factor conversion. The below code also relabels the levels of each variable to an easier understanding value using `labels`. Finally, we display the two newly created factors using the `select` function.
+
+```{r}
+connecticut_df %<>% 
+  mutate(`Property Type` = factor(`Property Type`,
+                                  levels = c("Single Family","Three Family","Condo","Residential","Commercial","Vacant Land"),
+                                  labels = c("Single Family Property","Three-Family Property","Condo","Residential Property","Commercial Property","Vacant Land")))
+
+connecticut_df %<>% 
+  mutate(`Residential Type` = factor(`Residential Type`,
+                                  levels = c("Single Family","Condo","Two Family","Three Family"),
+                                  labels = c("Single Household","Condo","Two-Family Home","Three-Family Home")))
+connecticut_df %>% 
+  select(Towns,`Property Type`,`Residential Type`) %>% head()
+```
+<h2>3.1 Tidy & Manipulate I</h2>
+
+Our merged dataset `connecticut_df` should now contain several columns, which all represent a single variable, and rows, which display different observations filtered by the `Towns`. We can double check that our dataset follows the `Tidy Dataset Principles` of Wickham and Grolemund (2016), by inspecting the merged set calling the `str` function.
+
+```{r}
+# We inspect the connecticut_df dataset
+str(connecticut_df)
+```
+Lastly, we check if we also fulfilled the third rule of tidy data: *"Each value must have its own cell."*. The below code uses the `vapply` to iterate `is.list` through our variables and their values, returning `TRUE` if any lists are indeed part of the dataset. `vapply` takes an extra argument `logical(1)` to ensure the output is `FALSE` and nothing else _(Rpubs.com)_.
+
+```{r}
+# Iterate through all values for lists
+standalone_val <- vapply(connecticut_df, is.list, logical(1))
+list_val <- names(connecticut_df)[standalone_val]
+list_val
+```
+As expected, the result is `character(0)`, which means no `TRUE` or *lists* were found in the values of `connecticut_df`. It is important to note that the dataset is still not *clean* yet, due to missing values and inconsistencies in the variables.
+
+<h2>3.2 Tidy & Manipulate II</h2>
+This section will mutate new variables to `connecticut_df`. We create w new variable `Average Gini` by calculating the mean of all variables starting with "Gini" using `rowMeans` and `starts_with` _(Rdocumentation.org, 2016)_. Once the new variable has been created, we drop the three individual `Gini` columns. We `round` the newly created variable by two digits after zero and display a few selected variables including `Average Gini`.
+
+```{r}
+# This is a chunk where you create/mutate at least one variable from existing variables
+connecticut_df %<>%
+  mutate(`Average Gini` = rowMeans(select(connecticut_df, starts_with("Gini")), na.rm = TRUE)) %>% 
+  select(-c(`Gini 2010`,`Gini 2015`,`Gini 2020`))
+connecticut_df$`Average Gini` <- round(connecticut_df$`Average Gini`, digits = 2)
+connecticut_df %>% 
+  select(Towns,`Assessed Value`,`Total Assisted`,`Average Gini`,`Sale Ratio`) %>% head(4)
+```
+Next, we would like to include a new factor Category correlating to our `Sale Ratio` variable, displaying if a property is _Low Priced_, _Medium Priced_ or _High Priced_. We display basic summary statistics of the variable using `summary`.
+
+```{r}
+# Basic summary statistics on the `Sale Ratio` variable
+summary(connecticut_df$`Sale Ratio`)
+```
+As would like to categorise `Sale Ratio` by its values, we need to proceed with `equal-depth` binning to equally distribute one-third of the values in `Low Priced`, one in `Medium Priced` and the last third in the `High Priced` category `Price Rubric`. We apply `discretize` from the `infotheo` package to the `Sale Ratio` variable with the `equalfreq` method, which ensures equal distribution across three bins _(Rdocumentation.org, 2022)_. After that, we convert the resulting binned values into a factor with corresponding labels to make it easier understandable. Finally, we display the results and verify the new variable.
+
+```{r}
+# Equal depth binning to `Sale Ratio` in three bins
+binned <- infotheo::discretize(connecticut_df$`Sale Ratio`, disc = "equalfreq", nbins = 3)
+# Convert variable to a factor with labels
+connecticut_df$`Price Rubric` <- factor(binned$X,
+                              labels = c("Low Priced","Medium Priced","High Priced"))
+# Display the result
+connecticut_df %>% select(Towns, `Assessed Value`, `Sale Amount`,`Sale Ratio`,`Price Rubric`) %>% head(3)
+```
+Lastly, we calculate the percentage of assisted housing by dividing `Total Assisted` variable by `Census 2010` and mutate the new variable `Ass. Housing Percentage`, rounded by two digits after zero, to our dataset `connecticut_df`.
+
+```{r}
+# Mutate Assited Housing Percentage to the dataframe
+connecticut_df %<>% 
+  mutate(`Ass. Housing Percentage` = round((`Total Assisted` / `Census 2010`) * 100,digits = 2))
+connecticut_df[,c(1,4:5,9,14,17:ncol(connecticut_df))] %>% head(3)
+```
+Before we start searching and fixing missing values, we should highlight the variable `Average Value` here. The values seem to be way too high when comparing to the variable `Assessed Value` or `Sale Amount`, let's see below if the variable is just formatted incorrectly but still displays the correct values. To ensure a correlation between the variable `Assessed Value` and `Average (Property) Value` is given, we apply the `log10` function on both variables to transform their values to a comparable scope and *change the scale for better understanding of the variable*. We apply `cor` on both transformed variables with all observations, by using `complete.obs` _(Rdocumentation.org, 2017)_.
+
+```{r}
+# Correlation between `Average (Property) Value` and `Assessed Value`
+log10_assessed_value <- log10(connecticut_df$`Assessed Value`)
+log10_average_value <- log10(connecticut_df$`Average Value`)
+cor(log10_assessed_value, log10_average_value, use = "complete.obs")
+```
+It looks like the variable `Average Value` doesn't have any correlation with `Assessed Value`, therefore we further explore if the variable is incorrect. One way is the use of a `scatterplot`, to visualise the result more clearly. We call the `ggplot2` package, to plot both variables using the scatter plot `geom_point`. Finally, we label the axis and add a title using `labs` to enhance the results understanding.
+
+```{r, fig.width=7, fig.height=4}
+library(ggplot2)
+# Let's plot the correlation
+ggplot(connecticut_df, aes(x=log10_assessed_value, log10_average_value)) + geom_point() + labs(title = "Correlation between Average (Property) Value and Assessed Value", x = "Assessed Value", y = "Average (Property) Value")
+```
+The scatter plot proves again, no correlation exists between `Average Value` and `Assessed Value`, so we drop this variable.
+
+```{r}
+# As no correlation is given, we drop the variable
+connecticut_df %<>% select(-`Average Value`)
+```
+
+<h2>4.1 Scan I</h2>
+<h3>4.1.1 Identifying missing and `0` values</h3>
+
+This section will clear the dataset from any missing data and `0` values. We will create a new variable and store all `NA` in it. `colSums` in combination with `is.na` goes through all variables of `connecticut_df` and stores `Booleans` in `missing_values`, `TRUE` if values are missing and `FALSE` if not _(Rdocumentation.org)_. When indexing through the new variable and setting the condition to `missing_values > 0`, we receive all variables with missing data.
+
+```{r}
+# Scan for missing values
+missing_values <- colSums(is.na(connecticut_df))
+missing_values[missing_values > 0]
+```
+Next, we use the same technique but adjust the parameters of our `Boolean` outputs by asking for a comparison. Are values of `connecticut_df` equal to `0`, `zero_values` will save this value as the logical operator `TRUE`. Any other value will be saved as `FALSE`. We again display all variables of `TRUE` Boolean and the total amount of `0` values.
+
+```{r}
+# We can scan for Zero values of numerical variables
+zero_values <- colSums(connecticut_df == 0, na.rm = TRUE)
+zero_values[zero_values > 0]
+```
+<h3>4.1.2 Replacing missing and `0` values</h3>
+
+After the identifictaion of all missing and `0` values we will replace them. Usually, it is recommended to replace missing qualitative data with their `mode`. As we are dealing with quite a lot of `NA's` for `Property Type` and `Residential Type` (almost 50% of all values), it is better to replace the missing data based on their appearances in the variable, instead of blindly replacing them by one entry. To do this, we create a function `replace_na` which takes a variable as an input. The function will create a new variable `prop` which contains the calculated proportion of each factor within the variable using `prop.table`. `prop.table` (from `dplyr`) takes a table `x` as an input, therefore we have to convert our dataframe to a table using `table` _(Zach, 2021)_. Next, it replaces `NA` values of that variable with random generated values using the `sample` function, while considering each values proportion (`prop=prop`). Each sample output can occur multiple time due to the attribute `replace=TRUE` within the sample.`size=sum(is.na())` ensures that all missing values of variable `x` are replaced, whereas `return` ensures that we can use the specified amended value for further use and it ends the functions execution.
+
+```{r}
+# Replacement of missing data
+replace_na <- function(x) {
+  proportion <- prop.table(table(x))
+  # Replace NA with random sample values based on the proportion of that value within the var
+  x[is.na(x)] <- sample(names(proportion), size = sum(is.na(x)),replace = TRUE, prob = proportion)
+  return(x)
+}
+# Apply the function on our qualitative variables
+connecticut_df$`Property Type` <- replace_na(connecticut_df$`Property Type`)
+connecticut_df$`Residential Type` <- replace_na(connecticut_df$`Residential Type`)
+# Check if we were sucessful
+summary(connecticut_df$`Property Type`) 
+summary(connecticut_df$`Residential Type`)
+```
+The output proves whether `Property Type` or `Residential Type` contain any more missing values, their level proportion also looks fairly distributed. The below code will now replace all `0` values of `Gov Assisted` and `Rental Assistance`, but first we display all variables of assisted housing in Connecticut.
+
+```{r}
+# Return row with `0` values
+connecticut_df %>% 
+  select(`Gov. Assisted`, `Rental Assistance`,`Financed Units`,`Total Assisted`) %>%
+  filter(`Gov. Assisted` == 0 | `Rental Assistance` == 0 | `Financed Units` == 0 | `Total Assisted` == 0) %>% head(3)
+```
+After inspecting `connecticut_df` variables of assisted housing, we see that `Gov. Assisted`, `Rental Assistance` and `Financed Units` are used to calculate `Total Assisted`. The above rows do look correct as the `0 values` do not seem to be implemented by mistake, as the variable `Total Assisted` is right. *In case we are having incorrect `0` values*, the below will still convert *all* `0` values to `NA` and then use a pre-defined mathematical formula `rules` to calculate and replace the `NA` values using the `validator` and `impute_lr` functions to fulfill the equation correctly.
+
+```{r}
+# First we replace all `0` values by `NA`
+connecticut_df[connecticut_df == 0] <- NA
+# We define the rules as a validator expression
+rules <- validate::validator(`Gov. Assisted` + `Rental Assistance` + `Financed Units` == `Total Assisted`,
+                             `Gov. Assisted` >= 0,
+                             `Rental Assistance` >= 0,
+                             `Financed Units` >= 0)
+# Now, we use `impute_lr` on `connecticut_df` to fulfill the equation using `rules`
+connecticut_df <- deductive::impute_lr(connecticut_df,rules)
+connecticut_df %>% 
+  select(`Gov. Assisted`, `Rental Assistance`,`Financed Units`,`Total Assisted`) %>%
+  filter(`Gov. Assisted` == 0 | `Rental Assistance` == 0 | `Financed Units` == 0 | `Total Assisted` == 0) %>% tail(3)
+```
+The calculation of the last three values are all correct, it seems the `0` values are correct.
+
+<h2>4.2 Scan II</h2>
+
+This chapter will focus on the identification and standardisation of outliers in the numerical variables. First, we save all numerical variables in a new variable `numeric_var` by iterating the `is.numeric` function over `connecticut_df` using `sapply`. The following `for loop` iterates through each variable of `numeric_var`, creating a `boxplot` for each column, witch their column name as the title `main = col`.
+
+```{r}
+# This is a chunk where you scan the numeric data for outliers 
+numeric_var <- sapply(connecticut_df, is.numeric)
+par(mfrow = c(3,4))
+for (col in names(connecticut_df)[numeric_var]){
+  boxplot(connecticut_df[[col]], main = col)}
+```
+`par(mfrow))` displays all boxplots in a `3x4` grid. The results show that all variables contain significant upper outlier , as the values are bigger than their `upper fence`. We could use the `summary` statistics on the variables to check if lower outlier exist.
+
+```{r}
+# First we check what values are considered upper or lower outlier
+AV_q1 <- quantile(connecticut_df$`Assessed Value`, 0.25)
+AV_q3 <- quantile(connecticut_df$`Assessed Value`, 0.75)
+AV_iqr <- AV_q3 - AV_q1
+AV_lower_fence <- AV_q1 - 1.5 * AV_iqr
+AV_upper_fence <- AV_q3 + 1.5 * AV_iqr
+cat("Lower Fence: ", AV_lower_fence, "\nUpper Fence ", AV_upper_fence)
+```
+Even thought the result seems false, the lower fence of `Assessed Value` can indeed be negative. The result simply means that this variable doesn't contain any lower outliers. Another way of testing our dataset for outliers is by applying the `Z-Score Standardisation`. First, we mutate a new variable to our dataset and apply `scale` to the variable, which will standardise all values to the corresponding z-score _(The number of standard deviations a data point is from the mean of a dataset)_. We have to convert the variable into a vector using `as.vector`, otherwise `scale` wouldn't work. We filter and display all values of `Total Permits` with a `Z-Score Total Permit` > 3 _(GeeksforGeeks, 2021)_.
+
+```{r}
+connecticut_df %<>% 
+  mutate(`Z-Score Total Permit` = as.vector(scale(`Total Permits`)))
+# Filter out z-scores > 3 
+connecticut_df %>% select(`Total Permits`, `Z-Score Total Permit`) %>%
+  filter(abs(`Z-Score Total Permit`) > 3)
+```
+
+As this method of checking outliers can be very repetitive, we define a function `impute_outliers` which will perform the same process as above but replaces all values smaller than `lower_fence` or bigger than `upper_fence` with the *variables mean* (defined in `ifelse` and the _`or`_ operator *`|`*). We apply the `impute_outliers` function to our numeric variables *four times* using a `for loop` due to the data distribution. Replacing the outlier with the mean changes the distribution of the data, which changes what values are considered outliers. To standardise newly created ones, we must perform the function multiple times as each process recalculates the `IQR` and their `fences`. Applying the method four times stabilises the data and no new outlier are identified.
+
+```{r}
+# We save a variable before the transformation, please ignore this for now
+before_sale_ratio <- connecticut_df$`Sale Ratio`
+# Apply mean replacement for lower_fence and upper_fence outliers
+impute_outliers <- function(var){
+  q1 <- quantile(var, 0.25, na.rm = TRUE)
+  q3 <- quantile(var, 0.75, na.rm = TRUE)
+  iqr <- q3 - q1
+  lower_fence <- q1 - 1.5 * iqr
+  upper_fence <- q3 + 1.5 * iqr
+  mean_var <- mean(var, na.rm=TRUE)
+
+  var <- ifelse(var < lower_fence | var > upper_fence, mean_var , var)
+  return(var)
+}
+# Apply the imputation to numeric variables three times to ensure it worked
+for (i in 1:4){
+  connecticut_df <- connecticut_df %>% mutate_if(is.numeric, impute_outliers)}
+```
+
+The below code is a copy of the inital `boxplot` creation to check if we were successful and all outliers are standardised.
+
+```{r}
+# Check if the standardisation worked
+numeric_var <- sapply(connecticut_df, is.numeric)
+par(mfrow = c(3,4))
+for (col in names(connecticut_df)[numeric_var]){
+  boxplot(connecticut_df[[col]], main = col)}
+```
+<p>The new numeric variables don't contain any more outliers. If we consider the scope of the `y-axis`, we can see that the distribution of the data changed drastically _(e.g. `Rental Assistance` was originally showing data ranging from 0 to 8000, now 0 to 120)_.</p>
+<p>A very convincing effect of the above can be seen below, where we compare the before and after of the variable `Sales Ratio` using a histogram with 20 bins.
+
+```{r}
+# Visualise Sale Ratio before and after Standardisation
+par(mfrow = c(2,1))
+hist(before_sale_ratio, main = "Sale Ratio before Standardisation", xlab = "Sale Ratio", breaks = 20)
+hist(connecticut_df$`Sale Ratio`, main = "Sale Ration after Standardisation", xlab = "Sale Ration", breaks=20)
+```
+Without this standardisation, we couldn't proceed with the transformation the data, to e.g. reduce the skewness even more.
+
+<h2>5. Transform</h2>
+<h3>5.1 BoxCox transformation of `Assessed Value`</h3>
+This section will focus on the transformation of some of `connecticut_df` numerical variables. We start by improving the distribution of the variable `Assessed Value`.
+
+```{r, warning=TRUE}
+# This is a chunk where you apply an appropriate transformation to at least one of the variables
+library(forecast)
+boxcox_SR <- BoxCox(connecticut_df$`Assessed Value`, lambda = "auto")
+lambda <- attr(boxcox_SR, which = "lambda")
+# Defining the histogram before the bxcox transformation using ggplot2
+graph1 <- ggplot(connecticut_df, aes(`Assessed Value`)) + geom_histogram(bins = 15, color = "red") +
+  labs(title = "Histogram of Assessed Value before the Box-Cox Transformation")
+# Defining the boxcox of Assessed Value using ggplot2
+p1 <- ggplot(boxcox_SR %>% as.data.frame())
+graph2 <- p1 + geom_histogram(aes(x = .), bins = 15, color = "black") +
+  labs(title = "Histogram of Assessed Value after the Box-Cox Transformation",
+       subtitle = bquote(~ lambda -- .(lambda)),
+       x = "Transformed Assessed Value")
+gridExtra::grid.arrange(graph1 ,graph2, nrow = 2) # Display both graphs
+```
+The BoxCox transformation was moderately effective in improving the variables distribution. Before the transformation, `Assessed Value` was distributed irregular, `BoxCox` definitely improved the symmetry visibly. `Lamba` has a value of `-0.2754`, which underlines that this transformation was moderately successful, as the data is now a bit left-skewed _(Rdocumentation.org, 2023)_. Finally, we update the values of `Assessed Value` with the transformed values.
+
+```{r}
+# Update `Assessed Value` with the transformed values
+connecticut_df$`Assessed Value` <- boxcox_SR
+```
+
+<h3>5.2 Square-root transformation of `Ass. Housing Percentage`</h3>
+
+Next, we would like to reduce the skewness of right-skewed data into a more distributed dataset. We use the same `for loop` as before, which displayed the boxplots of the numeric variables, and replace `boxplot` with `hist` to display the variables distribution. 
+
+```{r}
+# Plot `Total Assisted`
+par(mfrow = c(3:4))
+for (col in names(connecticut_df)[numeric_var]){
+  hist(connecticut_df[[col]], main = col, xlab = col)}
+```
+Next, we subset all right-skewed variables and apply `sqrt` - the square root transformation - with the goal of an output which is more symmetrical _(Educative, 2024)_.
+
+```{r}
+# Subset all right-skewed variables
+right_skewed_var <- connecticut_df %>% select(`Gov. Assisted`,`Rental Assistance`,`Financed Units`,`Total Assisted`,`Total Permits`)
+# Apply the square root transformation
+right_skewed_var %<>% sqrt()
+# Display all numerical right-skewed variables to see if their distribution improved
+par(mfrow = c(2:3))
+for (col in names(right_skewed_var)) {
+  hist(right_skewed_var[[col]], freq = FALSE, breaks = 30, main = col, xlab = col)
+  # This block displays the normal distribution of each graph
+  x <- seq(min(right_skewed_var[[col]], na.rm = TRUE), max(right_skewed_var[[col]], na.rm = TRUE), length.out = 100)
+  lines(x, dnorm(x, mean = mean(right_skewed_var[[col]], na.rm = TRUE), sd = sd(right_skewed_var[[col]], na.rm = TRUE)), col = 'red')}
+```
+The `square root transformation` was a success, especially for variables like `Gov. Assisted`, `Financed Units` and `Total Permits`. The distribution of the other variables also improved slightly. The red line shows each datasets ideal distribution by using `lines()` and calculating each standard distribution individually `sd(right_skewed_var[[col]])` _(Bobbitt, 2023)_.
+
+<h2>6. Reflective Journal</h2>
+<p>In this assessment I tried to answer the question of how I can ensure all datasets with varying structures and format are transformed into a unified, analysable format. I applied the five distinct steps of Data Wrangling, beginning with the Import and Understanding, moving through the Tidying and Manipulation, then onto Scanning, and finally, the Transformation of five different real-world datasets. The objective to answer my initial question was to convert these datasets into a unified, analysable format that would be suitable for in-depth analysis.</p>
+<p>Throughout this project, I encountered several challenges, particularly in handling the varying data formats and converting them into a cohesive, mergeable and tidy data structure. The process was further complicated by the requirement to handle missing values, identify and address outliers, and apply appropriate transformation to ensure the integrity of the final dataset. One difficulty was the transformation of right-skewed datasets into more symmetric distributions using the square root transformation. Similarly, the application of a successful BoxCox transformation was challenging, but it provided valuable experiences in applying different transformation techniques and assessing their effectiveness.</p>
+<p>Throughout this work, I have gained valuable insights into the complexities of data wrangling and the importance of the step-by-step data pre-processing.  It challenged me to apply a wide range of data wrangling techniques, from web scraping and tidying data to handling missing values, outliers, and performing transformations. Each step provided an opportunity to deepen my understanding of data wrangling and refine my approach when working with real-world datasets.</p>
+
+<h2>7. Presentation Link</h2>
+
+My presentation of this Assessment can be found [here](https://rmit-arc.instructuremedia.com/embed/30cf1fef-332c-493f-b54b-dced813ad73a)
+
+<h2>8. Sources</h2>
+* Connecticut Open Data. (2024). Connecticut Open Data. [online] Available at: https://data/ct.gov (https://data/ct.gov) [Accessed 05 Aug. 2024].
+*	GitHub. (2024). RSocrata. [online] Available at: https://github.com/Chicago/RSocrata (https://github.com/Chicago/RSocrata) [Accessed 06 Aug. 2024]. 
+* Wickham, H. and Grolemund, G. (2016). R for Data Science: Import, Tidy, Transform, Visualize, and Model Data. 1st Edition. O’Reilly Media [Accessed 08 Aug. 2024].
+* Dplyr.tidyverse.org. (2024). Subset rows using their positions — slice. [online] Available at: https://dplyr.tidyverse.org/reference/slice.html [Accessed 08 Aug. 2024].
+* Rdocumentation.org. (2018). slice function - RDocumentation. [online] Available at: https://www.rdocumentation.org/packages/dplyr/versions/0.7.6/topics/slice [Accessed 09 Aug. 2024].
+*	R-Packages. (2024). Introduction. [online] Available at: https://cran.r-project.org/web/packages/tidyr/vignettes/pivot.html [Accessed 09 Aug. 2024].
+* Dplyr.tidyverse.org. (2024). Mutating joins — mutate-joins. [online] Available at: https://dplyr.tidyverse.org/reference/mutate-joins.html [Accessed 09 Aug. 2024].
+* Rdocumentation.org. (2024). Sapply function - RDocumentation. [online] Available at: https://www.rdocumentation.org/packages/memisc/versions/0.99.31.7/topics/Sapply [Accessed 10 Aug. 2024].
+*	R-lib.org. (2024). Splice operator !!! — splice-operator. [online] Available at: https://rlang.r-lib.org/reference/splice-operator.html [Accessed 10 Aug. 2024].
+* Package ‘lubridate’ Type Package Title Make Dealing with Dates a Little Easier. (2020). Available at: https://cran.r-project.org/web/packages/lubridate/lubridate.pdf [Accessed 10 Aug. 2024].
+*	Rpubs.com. (2024). RPubs - lapply, sapply, and vapply. [online] Available at: https://rpubs.com/GilbertTeklevchiev/1113536 [Accessed 10 Aug. 2024].
+* Rdocumentation.org. (2016). rowMeans function - RDocumentation. [online] Available at: https://www.rdocumentation.org/packages/fame/versions/1.03/topics/rowMeans [Accessed 10 Aug. 2024].
+* Rdocumentation.org. (2022). infotheo package - RDocumentation. [online] Available at: https://www.rdocumentation.org/packages/infotheo/versions/1.2.0.1 [Accessed 11 Aug. 2024].
+* Rdocumentation.org. (2017). log10 function - RDocumentation. [online] Available at: https://www.rdocumentation.org/packages/SparkR/versions/2.1.2/topics/log10 [Accessed 11 Aug. 2024].
+* Rdocumentation.org. (2024). colSums function - RDocumentation. [online] Available at: https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/colSums [Accessed 11 Aug. 2024].
+* Zach (2021). How to Use prop.table() Function in R (With Examples). [online] Statology. Available at: https://www.statology.org/r-prop-table/.
+* GeeksforGeeks. (2021). Plot Z-Score in R. [online] Available at: https://www.geeksforgeeks.org/plot-z-score-in-r/ [Accessed 11 Aug. 2024].
+* Rdocumentation.org. (2023). boxcox function - RDocumentation. [online] Available at: https://www.rdocumentation.org/packages/EnvStats/versions/2.8.1/topics/boxcox [Accessed 12 Aug. 2024].
+* Educative. (2024). Educative Answers - Trusted Answers to Developer Questions. [online] Available at: https://www.educative.io/answers/how-to-calculate-the-square-root-of-a-number-in-r [Accessed 12 Aug. 2024].
+*	Bobbitt, Z. (2023). How to Use lines() Function in R (With Examples). [online] Statology. Available at: https://www.statology.org/lines-function-in-r/ [Accessed 13 Aug. 2024].
