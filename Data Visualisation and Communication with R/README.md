@@ -21,6 +21,10 @@ Note: Assessment 3 includes all Learnings from Week 1 to End.
 ## Assessment 1 (30%)
 ### Overview
 
+Video URL:
+
+https://rmit-arc.instructuremedia.com/embed/bd3d5195-9ebc-45c2-b728-afe247beaef4
+
 The ability to tell a compelling story using data visualisation is a powerful way to communicate data
 insights. In this assessment you will be asked to research, source, and choose one to three
 insightful data visualisations published on the web. You will then develop and present a story using
