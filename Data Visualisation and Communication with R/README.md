@@ -60,6 +60,11 @@ appropriate data sourced from the web and publish your work in a report.
 
 ## Assessment 3 (40%)
 ### Overview
+
+ShinyApps URL for the final Dashboard:
+
+https://timmrahrt.shinyapps.io/Assessment3/
+
 In the previous assessments, you were asked to find data visualisations designed by others to
 create a vodcast that demonstrated your skills in storytelling techniques and publishing a web report
 critiquing and fixing the work of others. In this assessment, you will get the chance to create a
