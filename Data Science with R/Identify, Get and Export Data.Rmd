@@ -1,9 +1,12 @@
 ---
 title: "Identify, Get and Export Data"
+author: "Your Name"
+date: "2025-10-13"
 output: html_document
 ---
-```{r}
+```{r, echo=TRUE}
 library(tibble) # for basic DataFrame manipulation
+library(here)
 ```
 
 # Overview
@@ -15,11 +18,11 @@ library(tibble) # for basic DataFrame manipulation
 # 1. Get and Export Data
 ## 1.1 Basic read.csv()
 
-```{r}
+```{r,echo=TRUE}
 # Get the current location
 getwd()
 # Standard R function
-iris1 <- read.csv('../ZDatasets/iris.csv', stringsAsFactors = TRUE) # Will read factors as <fctr>
+iris1 <- read.csv(here('ZDatasets','iris.csv'), stringsAsFactors = TRUE) # Will read factors as <fctr>
 head(iris1, n = 5)
 ```
 
@@ -29,7 +32,7 @@ head(iris1, n = 5)
 
 ```{r}
 # read.csv() is a wrapper function of read.table(sep = ',')
-iris2 <- read.table('../ZDatasets/iris.csv', sep = ',', header = TRUE, row.names = 1) # as indexcol is given
+iris2 <- read.table(here('ZDatasets','iris.csv'), sep = ',', header = TRUE, row.names = 1) # as indexcol is given
 head(iris2, n=3)
 ```
 
@@ -39,7 +42,7 @@ head(iris2, n=3)
 ```{r}
 # Load the package
 library(readr)
-iris3 <- read_csv("../ZDatasets/iris.csv")
+iris3 <- read_csv(here("ZDatasets","iris.csv"))
 iris3 <- column_to_rownames(iris3, var = colnames(iris3)[1]) # changes the first column to the index
 head(iris3, n=3)
 ```
@@ -49,7 +52,7 @@ head(iris3, n=3)
 ```{r}
 library(readxl) # read_excel() returns a tibble
 # Skip 1 row and add colnames
-iris4 <- read_excel("../ZDatasets/iris.xlsx", sheet = 'iris', skip = 1, col_names = paste("Var", 1:5))
+iris4 <- read_excel(here("ZDatasets","iris.xlsx"), sheet = 'iris', skip = 1, col_names = paste("Var", 1:5))
 head(iris4, 3)
 ```
 
@@ -63,10 +66,10 @@ df <- data.frame(cost = c(10, 25, 40),
                 suv = c(TRUE, TRUE, FALSE),
                 row.names = c("car1", "car2", "car3"))
 # Export as .csv
-df |> write_csv("../ZDatasets/export_example1.csv") # path = "" -> to change the path
-df |> write_csv("../ZDatasets/export_example2.csv", col_names = FALSE) # excl. colnames
-df |> write.csv("../ZDatasets/export_example3.csv", row.names = FALSE) # excl. rownames
-df |> write_delim("../ZDatasets/export_example1.txt") # Export df as a text file
+df |> write_csv(here("ZDatasets","export_example1.csv")) # path = "" -> to change the path
+df |> write_csv(here("ZDatasets","export_example2.csv"), col_names = FALSE) # excl. colnames
+df |> write.csv(here("ZDatasets","export_example3.csv"), row.names = FALSE) # excl. rownames
+df |> write_delim(here("ZDatasets","export_example1.txt")) # Export df as a text file
 ```
 
 # 2. Data Scraping
