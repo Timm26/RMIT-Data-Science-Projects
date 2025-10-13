@@ -2,4 +2,121 @@
 title: "Identify, Get and Export Data"
 output: html_document
 ---
+```{r}
+library(tibble) # for basic DataFrame manipulation
+```
+
+# Overview
+
+- 1. Get and Export Data
+- 2. Webscraping
+
+
+# 1. Get and Export Data
+## 1.1 Basic read.csv()
+
+```{r}
+# Get the current location
+getwd()
+# Standard R function
+iris1 <- read.csv('../ZDatasets/iris.csv', stringsAsFactors = TRUE) # Will read factors as <fctr>
+head(iris1, n = 5)
+```
+
+## 1.2 Basic read.table()
+- *sep = ';'* for semicolon separated columns
+- *sep = '\'* for tab separated columns
+
+```{r}
+# read.csv() is a wrapper function of read.table(sep = ',')
+iris2 <- read.table('../ZDatasets/iris.csv', sep = ',', header = TRUE, row.names = 1) # as indexcol is given
+head(iris2, n=3)
+```
+
+## 1.3 {readr} package functions
+### 1.3.1 read_csv()
+
+```{r}
+# Load the package
+library(readr)
+iris3 <- read_csv("../ZDatasets/iris.csv")
+iris3 <- column_to_rownames(iris3, var = colnames(iris3)[1]) # changes the first column to the index
+head(iris3, n=3)
+```
+
+## 1.4 {readxl} package
+
+```{r}
+library(readxl) # read_excel() returns a tibble
+# Skip 1 row and add colnames
+iris4 <- read_excel("../ZDatasets/iris.xlsx", sheet = 'iris', skip = 1, col_names = paste("Var", 1:5))
+head(iris4, 3)
+```
+
+## 1.5 Export data
+### 1.5.1 Export CSV files
+
+```{r}
+# Create a dataframe
+df <- data.frame(cost = c(10, 25, 40),
+                color = c("blue", "red", "green"),
+                suv = c(TRUE, TRUE, FALSE),
+                row.names = c("car1", "car2", "car3"))
+# Export as .csv
+df |> write_csv("../ZDatasets/export_example1.csv") # path = "" -> to change the path
+df |> write_csv("../ZDatasets/export_example2.csv", col_names = FALSE) # excl. colnames
+df |> write.csv("../ZDatasets/export_example3.csv", row.names = FALSE) # excl. rownames
+df |> write_delim("../ZDatasets/export_example1.txt") # Export df as a text file
+```
+
+# 2. Data Scraping
+
+```{r}
+# Load the libraries
+library(rvest)
+```
+
+## 2.1 Scrape a CSV file form a Website
+
+```{r}
+# create a character string of the url for the online csv file
+url <- "https://data.gov.au/data/dataset/29128ebd-dbaa-4ff5-8b86-d9f30de56452/resource/cf663ed1-0c5e-497f-aea9-e74bfda9cf44/download/otp_time_series_web.csv"
+# use read_csv() to import
+ontime_data <- read_csv(url)
+ontime_data[1:5, 1:3]
+```
+
+## 2.2 Scrape a XLS file from a Website
+
+```{r}
+lf_url <- "https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-australia-detailed/aug-2021/6291012.xls"
+# We need R to download this file as a temporary file
+tmp <- tempfile(fileext = ".xls")
+download.file(lf_url, destfile = tmp, mode = 'wb')
+# Look at the sheets
+lf_sheets <- readxl::excel_sheets(tmp)
+lf_sheets
+```
+
+```{r}
+# Get the 'Data1' worksheet
+labour_force <- readxl::read_xls(tmp, sheet = "Data1", skip = 9)
+head(labour_force)
+```
+
+## 2.3 Scraping HTML table data
+
+```{r}
+# Use read_html from rvest
+births <- read_html("https://www.ssa.gov/oact/babynames/numberUSbirths.html")
+# Display the count of HTML tables
+alltables <- (html_nodes(births, "table"))
+length(alltables)
+```
+
+```{r}
+# Since the data has just 1 table
+births_data <- html_table(alltables[[1]])
+head(births_data)
+```
 

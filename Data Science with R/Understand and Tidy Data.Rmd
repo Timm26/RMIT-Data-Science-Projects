@@ -1,0 +1,16 @@
+---
+title: "Understand and Tidy Data"
+output: html_document
+---
+```{r}
+# Packages
+# library(tidyverse)
+```
+
+
+# 1. First Glimpse of a Dataset
+## 1.1 Inspect the structure
+
+```{r}
+str(iris01)
+```
