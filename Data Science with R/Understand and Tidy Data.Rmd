@@ -1,10 +1,16 @@
 ---
 title: "Understand and Tidy Data"
+author: "Your Name"
+date: "2025-10-13"
 output: html_document
 ---
 ```{r}
 # Packages
 # library(tidyverse)
+library(here)
+library(readr)
+# Get data
+iris <- read_csv(here("ZDatasets","iris.csv"))
 ```
 
 
@@ -12,5 +18,39 @@ output: html_document
 ## 1.1 Inspect the structure
 
 ```{r}
-str(iris01)
+str(iris1)
 ```
+
+## 1.2 Types of variables
+
+- Quantitative variables: Continuous, Discrete
+- Qualitative variables: Nominal, Ordinal
+
+```{r}
+# Check the column
+class(iris$Petal.Length)
+typeof(iris$Petal.Width)
+is.factor(iris$Species) # Species is actually a character here not factor
+```
+
+## 1.3 Factor
+
+```{r}
+# Changing a character column to factor, each value one level
+factor(iris$Species)
+is.factor(iris$Species)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
