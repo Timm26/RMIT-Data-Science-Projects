@@ -20,6 +20,7 @@ iris <- read_csv(here("ZDatasets","iris.csv"))
 
 ```{r}
 str(iris1)
+# names(iris1) # Shows column names but so does 'str()'
 ```
 
 ## 1.2 Types of variables
