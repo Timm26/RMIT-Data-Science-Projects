@@ -9,10 +9,11 @@ output: html_document
 # library(tidyverse)
 library(here)
 library(readr)
+library(dplyr)
+library(magrittr)
 # Get data
 iris <- read_csv(here("ZDatasets","iris.csv"))
 ```
-
 
 # 1. First Glimpse of a Dataset
 ## 1.1 Inspect the structure
@@ -37,11 +38,31 @@ is.factor(iris$Species) # Species is actually a character here not factor
 
 ```{r}
 # Changing a character column to factor, each value one level
-factor(iris$Species)
+iris$Species <- factor(iris$Species,
+                       levels = c("setosa", "versicolor", "virginica"),
+                       labels = c("Setosa", "Versicolor", "Virginica"))
+                       # Can be ordered = True
 is.factor(iris$Species)
 ```
 
+```{r}
+# Print the individual categories
+levels(iris$Species)
+# You can also look at unique values
+unique(iris$Species)
+# Alternatively
+iris |> dplyr::distinct(Species)
+```
 
+## 1.4 Subset data
+
+```{r}
+# Filter for Sepal.Length under 5
+iris$Sepal.Length[iris$Sepal.Length < 5]
+
+# Filter the dataframe
+iris |> filter(Sepal.Length < 5) |> head()
+```
 
 
 
