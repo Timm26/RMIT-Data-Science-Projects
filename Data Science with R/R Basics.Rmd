@@ -3,3 +3,112 @@ title: "R Basics"
 output: html_document
 ---
 
+# 1. Vectors
+
+```{r}
+ex1 <- c("a", "b", "c", 1, 2, 3)
+class(ex1) # coerces numbers to strings
+ex1[4] # Take the first index
+```
+
+# 2. Lists
+
+```{r}
+# Create a list
+list1 <- list(1:3, "a", c(TRUE, FALSE, TRUE), c(2.5, 4.2))
+class(list1)
+str(list1)
+```
+
+```{r}
+# Add elements to an existing list
+list2 <- append(list1, c("credit1", "debit", "Paypal"))
+# Name a list
+names(list2) <- c("item1", "item2", "item3", "item4", "item5", "item6", "item7")
+list2
+# Call by name
+list2$item3
+```
+
+# 3. Matrix
+
+```{r}
+# Create a matrix
+m1 <- matrix(1:6, nrow = 2, ncol = 3)
+v1 <- c(1,4,5)
+v2 <- c(6,8,10)
+m2 <- cbind(v1,v2) # Column bind two vectors
+m3 <- rbind(v1,v2) # Row bind two vectors
+# Name the vector
+rownames(m1) <- c("subject1", "subject2")
+colnames(m1) <- c("col1", "col2", "col3")
+# Display results
+m1
+m2 # Columns already named
+m3 # Rows already named
+```
+
+```{r}
+# Show the attributes
+attributes(m1)
+```
+
+```{r}
+# Subset the value in the first row and second column
+m1[1,2]
+# Subset for rows 1 and 2 but keep al rows
+m1[1:2,]
+```
+
+```{r}
+# Use row names to subset
+m1['subject1',]
+```
+
+# 4. DataFrame
+
+```{r}
+# Create a dataframe
+df1 <- data.frame(col1 = 1:3,
+                  col2 = c("credit", "debit", "paypal"),
+                  col3 = c(TRUE, FALSE, TRUE),
+                  col4 = c(25.5, 44.2, 54.9))
+# Inspect it's structure
+str(df1)
+```
+
+```{r}
+# Create a new vector
+v4 <- c("VIC", "NSW", "TAS")
+df2 <- cbind(df1, v4)
+rownames(df2) <- c("subj1", "subj2", "subj3")
+colnames(df2) <- c("number", "card_type", "fraud", "transaction")
+str(df2)
+View(df2)
+```
+
+```{r}
+# Subset by row numbers
+df2[2:3,]
+# Subset by column numbers
+df2[2, c(1,4)]
+# Same as above but uses row and column names
+df2[c("subj2", "subj3"), c("number", "transaction")]
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
