@@ -1,0 +1,13 @@
+"Daily Weather Observations for Learmonth, Western Australia for January 2021"
+"Prepared at 08:20 UTC on Wednesday  6 January 2021   IDCJDW6073.202101"
+"Copyright 2003 Commonwealth Bureau of Meteorology"
+"Some cloud observations are from automated equipment; these are somewhat different to those made by a human observer and may not appear every day."
+"Observations were drawn from Learmonth Airport {station 005007}"
+
+,"Date","Minimum temperature (°C)","Maximum temperature (°C)","Rainfall (mm)","Evaporation (mm)","Sunshine (hours)","Direction of maximum wind gust ","Speed of maximum wind gust (km/h)","Time of maximum wind gust","9am Temperature (°C)","9am relative humidity (%)","9am cloud amount (oktas)","9am wind direction","9am wind speed (km/h)","9am MSL pressure (hPa)","3pm Temperature (°C)","3pm relative humidity (%)","3pm cloud amount (oktas)","3pm wind direction","3pm wind speed (km/h)","3pm MSL pressure (hPa)"
+,2021-01-1,26.6,39.1,0,,,SSW,35,20:43,33.3,34,8,SSE,13,1008.2,36.4,32,,NNE,13,1005.9
+,2021-01-2,25.8,41.8,0,,,SW,46,17:04,35.2,30,,S,17,1007.5,41.0,23,,W,24,1004.3
+,2021-01-3,25.1,41.7,0,,,SW,46,14:31,33.9,31,,SSW,19,1007.1,39.1,21,,WSW,26,1004.8
+,2021-01-4,23.4,38.5,0,,,SW,44,14:17,30.4,47,,SSW,24,1007.0,37.0,22,,SW,30,1003.9
+,2021-01-5,20.4,34.1,0,,,ENE,61,00:00,28.0,59,1,W,11,1007.2,33.0,46,,NNE,31,1004.9
+,2021-01-6,25.2,,0,,,,,,29.2,60,,NNE,20,1010.4,32.4,43,,NNE,17,1006.8

@@ -47,7 +47,8 @@ iris3 <- column_to_rownames(iris3, var = colnames(iris3)[1]) # changes the first
 head(iris3, n=3)
 ```
 
-## 1.4 {readxl} package
+## 1,4 Excel Spreadsheets
+## 1.4.1 {readxl} package
 
 ```{r}
 library(readxl) # read_excel() returns a tibble
@@ -55,6 +56,14 @@ library(readxl) # read_excel() returns a tibble
 iris4 <- read_excel(here("ZDatasets","iris.xlsx"), sheet = 'iris', skip = 1, col_names = paste("Var", 1:5))
 head(iris4, 3)
 ```
+
+## 1.4.2 {openxlsx} package
+
+```{r}
+grades <- openxlsx::read.xlsx(here("ZDatasets","Grade dataset.xlsx")) # just 1 sheet
+head(grades)
+```
+
 
 ## 1.5 Export data
 ### 1.5.1 Export CSV files

@@ -33,9 +33,11 @@ str(iris1)
 class(iris$Petal.Length)
 typeof(iris$Petal.Width)
 is.factor(iris$Species) # Species is actually a character here not factor
+iris$Species <- as.character(iris$Species)
+is.character(iris$Species)
 ```
 
-## 1.3 Factor
+# 2. Factor
 
 ```{r}
 # Changing a character column to factor, each value one level
@@ -55,7 +57,7 @@ unique(iris$Species)
 iris |> dplyr::distinct(Species)
 ```
 
-## 1.4 Subset data
+# 3. Subset data
 
 ```{r}
 # Filter for Sepal.Length under 5
@@ -64,6 +66,113 @@ iris$Sepal.Length[iris$Sepal.Length < 5]
 # Filter the dataframe
 iris |> filter(Sepal.Length < 5) |> head()
 ```
+
+## 3.1 Subsetting with 'which'
+
+```{r}
+iris$Petal.Length[which(iris$Petal.Length < 1.4)]
+```
+
+# 4. {tidyr package} to clean data
+
+## 4.1 Wide vs Long Datasets
+
+Used to clean data. Sometimes:
+- Column headers are values, not variable names
+- Multiple variables are stored in rows
+- Multiple variables are stored in one column
+- Multiple columns from a variable
+
+```{r}
+# Read data
+grades <- openxlsx::read.xlsx(here("ZDatasets","Grade dataset.xlsx"))
+head(grades)
+```
+
+```{r}
+# Grades by student - wide format
+grades <- pivot_wider(data = grades, names_from = "Name", values_from = "Grade")
+grades
+```
+
+```{r}
+# Back to long format 
+grades <- pivot_longer(data=grades, names_to = "Name", values_to = "Grade", cols = 2:6)
+```
+
+```{r}
+# Grades by Subject
+pivot_wider(data=grades, names_from="Subject", values_from="Grade") 
+```
+
+### Different example - Column headers are values, not variable names
+
+```{r}
+# Using in-build tidyr data
+head(table4a)
+```
+
+```{r}
+# Column headers are values, not variable names
+table4a |> 
+  pivot_longer(cols = c(`1999`, `2000`),
+              names_to = "year",
+              values_to = "cases") |> head()
+```
+
+## 4.2 Separate function
+
+Used when multiple variables are stored in one column and you want to split them according to the separate character.
+
+```{r}
+head(table3)
+```
+
+```{r}
+# Separate
+table3 |> 
+  separate(rate, into = c("cases", "population"), sep ='/') |> head()
+```
+
+## 4.3 unite() function
+
+Unite is the inverse of `separate() function. Use it to combine multiple columns into a single column.
+
+```{r}
+table5 |> head()
+```
+
+```{r}
+# Unite
+table5 |> 
+  unite(new_year, century, year) |> head()
+```
+
+## 4.4 Reshaping data
+
+```{r}
+# Get the data
+bom <- read.csv(here("ZDatasets","BOM - Learmonth WA - December 2020.csv"), skip = 6, check.names = F)
+# Subset data
+bom_new <- bom[, c("Date", "9am wind direction", "9am wind speed (km/h)")]
+bom_new$Date <- as.Date(bom_new$Date) # Update the date format
+bom_new |> head()
+```
+
+```{r}
+# Reshape to wide format
+bom_new %<>% 
+  pivot_wider(names_from = `9am wind direction`,
+              values_from = `9am wind speed (km/h)`) |> 
+  separate(Date,
+           into = c("Year", "Month", "Day"),
+           sep = "-")
+```
+
+
+
+
+
 
 
 
