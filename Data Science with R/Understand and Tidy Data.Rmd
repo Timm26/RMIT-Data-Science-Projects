@@ -21,6 +21,8 @@ iris <- read_csv(here("ZDatasets","iris.csv"))
 ```{r}
 str(iris1)
 # names(iris1) # Shows column names but so does 'str()'
+# Number of variables in the dataset
+paste0("Number of variables: ",length(as.list(names(iris1))))
 ```
 
 ## 1.2 Types of variables
@@ -168,20 +170,4 @@ bom_new %<>%
            into = c("Year", "Month", "Day"),
            sep = "-")
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

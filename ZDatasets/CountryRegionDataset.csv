@@ -1,0 +1,206 @@
+Country,region,region_txt
+Australia,12,Australasia & Oceania
+New Zealand,12,Australasia & Oceania
+New Hebrides,12,Australasia & Oceania
+New Caledonia,12,Australasia & Oceania
+Fiji,12,Australasia & Oceania
+Papua New Guinea,12,Australasia & Oceania
+Wallis and Futuna,12,Australasia & Oceania
+French Polynesia,12,Australasia & Oceania
+Vanuatu,12,Australasia & Oceania
+Solomon Islands,12,Australasia & Oceania
+Dominican Republic,2,Central America & Caribbean
+Guatemala,2,Central America & Caribbean
+Nicaragua,2,Central America & Caribbean
+Costa Rica,2,Central America & Caribbean
+Panama,2,Central America & Caribbean
+El Salvador,2,Central America & Caribbean
+Haiti,2,Central America & Caribbean
+Honduras,2,Central America & Caribbean
+Jamaica,2,Central America & Caribbean
+Bahamas,2,Central America & Caribbean
+Barbados,2,Central America & Caribbean
+Trinidad and Tobago,2,Central America & Caribbean
+Grenada,2,Central America & Caribbean
+Belize,2,Central America & Caribbean
+Guadeloupe,2,Central America & Caribbean
+Martinique,2,Central America & Caribbean
+Dominica,2,Central America & Caribbean
+Cuba,2,Central America & Caribbean
+Antigua and Barbuda,2,Central America & Caribbean
+St. Kitts and Nevis,2,Central America & Caribbean
+St. Lucia,2,Central America & Caribbean
+Georgia,7,Central Asia
+Azerbaijan,7,Central Asia
+Armenia,7,Central Asia
+Kazakhstan,7,Central Asia
+Tajikistan,7,Central Asia
+Uzbekistan,7,Central Asia
+Kyrgyzstan,7,Central Asia
+Turkmenistan,7,Central Asia
+Japan,4,East Asia
+Taiwan,4,East Asia
+South Korea,4,East Asia
+Hong Kong,4,East Asia
+China,4,East Asia
+North Korea,4,East Asia
+Macau,4,East Asia
+East Germany (GDR),9,Eastern Europe
+Poland,9,Eastern Europe
+Czechoslovakia,9,Eastern Europe
+Yugoslavia,9,Eastern Europe
+Soviet Union,9,Eastern Europe
+Albania,9,Eastern Europe
+Bulgaria,9,Eastern Europe
+Romania,9,Eastern Europe
+Hungary,9,Eastern Europe
+Croatia,9,Eastern Europe
+Lithuania,9,Eastern Europe
+Ukraine,9,Eastern Europe
+Moldova,9,Eastern Europe
+Russia,9,Eastern Europe
+Bosnia-Herzegovina,9,Eastern Europe
+Latvia,9,Eastern Europe
+Estonia,9,Eastern Europe
+Slovak Republic,9,Eastern Europe
+Macedonia,9,Eastern Europe
+Belarus,9,Eastern Europe
+Czech Republic,9,Eastern Europe
+Slovenia,9,Eastern Europe
+Kosovo,9,Eastern Europe
+Montenegro,9,Eastern Europe
+Serbia-Montenegro,9,Eastern Europe
+Serbia,9,Eastern Europe
+Jordan,10,Middle East & North Africa
+Egypt,10,Middle East & North Africa
+Lebanon,10,Middle East & North Africa
+Turkey,10,Middle East & North Africa
+Iran,10,Middle East & North Africa
+South Yemen,10,Middle East & North Africa
+Israel,10,Middle East & North Africa
+Kuwait,10,Middle East & North Africa
+West Bank and Gaza Strip,10,Middle East & North Africa
+Algeria,10,Middle East & North Africa
+Morocco,10,Middle East & North Africa
+North Yemen,10,Middle East & North Africa
+Syria,10,Middle East & North Africa
+United Arab Emirates,10,Middle East & North Africa
+Iraq,10,Middle East & North Africa
+Saudi Arabia,10,Middle East & North Africa
+Western Sahara,10,Middle East & North Africa
+Tunisia,10,Middle East & North Africa
+Libya,10,Middle East & North Africa
+Bahrain,10,Middle East & North Africa
+Qatar,10,Middle East & North Africa
+Yemen,10,Middle East & North Africa
+International,10,Middle East & North Africa
+Mexico,1,North America
+United States,1,North America
+Canada,1,North America
+Uruguay,3,South America
+Venezuela,3,South America
+Brazil,3,South America
+Argentina,3,South America
+Paraguay,3,South America
+Colombia,3,South America
+Bolivia,3,South America
+Peru,3,South America
+Chile,3,South America
+Ecuador,3,South America
+Guyana,3,South America
+Suriname,3,South America
+French Guiana,3,South America
+Falkland Islands,3,South America
+Pakistan,6,South Asia
+India,6,South Asia
+Afghanistan,6,South Asia
+Sri Lanka,6,South Asia
+Bangladesh,6,South Asia
+Nepal,6,South Asia
+Maldives,6,South Asia
+Mauritius,6,South Asia
+Bhutan,6,South Asia
+Philippines,5,Southeast Asia
+Cambodia,5,Southeast Asia
+South Vietnam,5,Southeast Asia
+Brunei,5,Southeast Asia
+Thailand,5,Southeast Asia
+Myanmar,5,Southeast Asia
+Malaysia,5,Southeast Asia
+Singapore,5,Southeast Asia
+Indonesia,5,Southeast Asia
+Laos,5,Southeast Asia
+Vietnam,5,Southeast Asia
+East Timor,5,Southeast Asia
+Ethiopia,11,Sub-Saharan Africa
+Zambia,11,Sub-Saharan Africa
+Zaire,11,Sub-Saharan Africa
+People's Republic of the Congo,11,Sub-Saharan Africa
+Sudan,11,Sub-Saharan Africa
+Botswana,11,Sub-Saharan Africa
+Chad,11,Sub-Saharan Africa
+South Africa,11,Sub-Saharan Africa
+Kenya,11,Sub-Saharan Africa
+Somalia,11,Sub-Saharan Africa
+Tanzania,11,Sub-Saharan Africa
+Namibia,11,Sub-Saharan Africa
+Nigeria,11,Sub-Saharan Africa
+Angola,11,Sub-Saharan Africa
+Mauritania,11,Sub-Saharan Africa
+Djibouti,11,Sub-Saharan Africa
+Rhodesia,11,Sub-Saharan Africa
+Mozambique,11,Sub-Saharan Africa
+Uganda,11,Sub-Saharan Africa
+Lesotho,11,Sub-Saharan Africa
+Gabon,11,Sub-Saharan Africa
+Senegal,11,Sub-Saharan Africa
+Zimbabwe,11,Sub-Saharan Africa
+Guinea,11,Sub-Saharan Africa
+Central African Republic,11,Sub-Saharan Africa
+Seychelles,11,Sub-Saharan Africa
+Swaziland,11,Sub-Saharan Africa
+Burkina Faso,11,Sub-Saharan Africa
+Niger,11,Sub-Saharan Africa
+Togo,11,Sub-Saharan Africa
+Ghana,11,Sub-Saharan Africa
+Liberia,11,Sub-Saharan Africa
+Republic of the Congo,11,Sub-Saharan Africa
+Mali,11,Sub-Saharan Africa
+Rwanda,11,Sub-Saharan Africa
+Sierra Leone,11,Sub-Saharan Africa
+Cameroon,11,Sub-Saharan Africa
+Madagascar,11,Sub-Saharan Africa
+Burundi,11,Sub-Saharan Africa
+Ivory Coast,11,Sub-Saharan Africa
+Equatorial Guinea,11,Sub-Saharan Africa
+Malawi,11,Sub-Saharan Africa
+Comoros,11,Sub-Saharan Africa
+Benin,11,Sub-Saharan Africa
+Gambia,11,Sub-Saharan Africa
+Eritrea,11,Sub-Saharan Africa
+Democratic Republic of the Congo,11,Sub-Saharan Africa
+Guinea-Bissau,11,Sub-Saharan Africa
+South Sudan,11,Sub-Saharan Africa
+Greece,8,Western Europe
+Italy,8,Western Europe
+West Germany (FRG),8,Western Europe
+Switzerland,8,Western Europe
+Spain,8,Western Europe
+Ireland,8,Western Europe
+United Kingdom,8,Western Europe
+Netherlands,8,Western Europe
+Belgium,8,Western Europe
+Sweden,8,Western Europe
+Austria,8,Western Europe
+France,8,Western Europe
+Portugal,8,Western Europe
+Cyprus,8,Western Europe
+Andorra,8,Western Europe
+Malta,8,Western Europe
+Denmark,8,Western Europe
+Norway,8,Western Europe
+Vatican City,8,Western Europe
+Luxembourg,8,Western Europe
+Iceland,8,Western Europe
+Finland,8,Western Europe
+Germany,8,Western Europe

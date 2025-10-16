@@ -1,0 +1,202 @@
+---
+title: "Manipulating data"
+output: html_document
+---
+```{r}
+# Packages
+library(dplyr)
+library(magrittr)
+library(readr)
+library(openxlsx)
+```
+
+```{r}
+# Import some datasets
+country <- read_csv(here("ZDatasets", "CountryRegionDataset.csv"))
+terror  <- read_csv(here("ZDatasets", "globalterrorismdb_0718distWeek3.csv"))
+```
+
+
+# 1. {dplyr} package
+
+- select()
+- filter()
+- arrange()
+- mutate()
+- summarise()
+
+## 1.1 Filter data
+
+- readr::read_excel() is faster than openxlsx::read.xlsx()
+- read_excel also correctly identifies the date columns
+
+```{r}
+# Get data
+flu <- read_excel(here("ZDatasets","Influenza (laboratory confirmed) Public datset 2008 to 2017-1.xlsx"), sheet = 1, skip = 1)
+names(flu)
+# Rename some column names
+flu <- flu %<>% 
+  rename(
+    Week_Ending_Friday = `Week Ending (Friday)`,
+    Age_group = `Age  group`,
+    Indigenous_status = `Indigenous status`
+  )
+flu |> head()
+```
+
+```{r}
+# Filter to Queensland female
+flu %<>%
+  filter(State == "Qld" & Gender == "Female")
+flu |> head()
+```
+
+## 1.2 count() and arrange() function
+
+```{r}
+# Population count
+flu |> 
+  filter(Indigenous_status == "Indigenous") |> 
+  count() / count(flu) * 100
+```
+
+```{r}
+# Arrange()
+flu |> 
+  arrange(Age_group)
+```
+
+## 1.3 Create a new variable
+
+```{r}
+# Get data
+starwars <- starwars
+# Number of variables
+starwars |> ncol()
+```
+
+### 1.3.1 Mutate() funtion
+
+```{r}
+# Add a variable using mutate()
+starwars %<>%
+  mutate(BMI = mass / (height/100)^2)
+starwars[,10:15] |> head()
+```
+
+### 1.3.2 Create a new variable using case_when
+
+```{r}
+starwars %<>%
+  mutate(weight_class = case_when(is.na(BMI) ~ "Unknown",
+                                  BMI < 18.5 ~ "Underweight BMI",
+                                  BMI >= 25 ~ "Healthy BMI",
+                                  TRUE ~ "Unknown"))
+starwars[,11:16] |> head()
+```
+
+```{r}
+# Check any NA's
+table(starwars$weight_class, useNA = "always")
+```
+
+### 1.3.3 Select() function
+
+```{r}
+starwars |> 
+  select(name, mass, height, BMI, weight_class) |>
+  arrange(name) |> head()
+```
+
+#### 1.3.3.1 Select statements 'contains()'
+
+```{r}
+# Filter columns that contains "ir"
+starwars |> 
+  select(contains("ir")) |> head()
+```
+
+#### starts_with()
+
+```{r}
+# Filter columns that start with "B" or "b"
+starwars |> 
+  select(starts_with("B")) |> head()
+```
+
+
+## 1.4 Filter and create new variables
+
+```{r}
+# Combine multiple columns
+library(glue)
+starwars |> 
+  filter(species == "Human") |> 
+  arrange(height, mass) |> 
+  group_by(hair_color) |> 
+  transmute(unitid = glue("{name} {hair_color} {height} {mass}")) |> 
+  head()
+```
+
+
+
+# 2. Join, mutate and merge datasets
+
+```{r}
+# Get the data
+library(nycflights13)
+airlines <- nycflights13::airlines
+airports <- nycflights13::airports
+flights <- nycflights13::flights
+planes <- nycflights13::planes
+weather <- nycflights13::weather
+
+# Identify variables
+airports |> names()
+```
+
+
+- *Mutating join*: This group of functions add new variables to one data frame matching observations in another (inner_join, left_join, right_join, full_join)
+- *Filtering joins*: This group of functions filter observations from one data frame based on whether or not they match an observation in the other table (semi_join, anti_join)
+- *Set operations*: This group of functions treat observations as if they were set elements. (union, intersect, setdiff)
+- *Merging datasets*: bind_rows, bind_cols
+
+## 2.1 Mutating joins
+
+### 2.1.1 Inner join
+
+```{r}
+inner_join_weather <- weather |> 
+  inner_join(flights, by = c("year","month","day","time_hour","origin"))
+inner_join_weather |> head()
+```
+
+### 2.1.2 Left join
+
+```{r}
+terror |> 
+  left_join(country, by = c("country_txt" = "Country")) |> head()
+```
+
+
+## 2.2 Filtering joins
+
+## 2.3 Set operations
+
+### 2.3.1 Intersect
+
+Filtering for intersecting columns.
+
+```{r}
+intersect(airlines |> names(),
+          airports |> names())
+```
+
+
+
+
+
+
+
+
+
