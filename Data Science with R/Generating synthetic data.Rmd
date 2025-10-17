@@ -1,0 +1,108 @@
+---
+title: "Generating synthetic data"
+output: html_document
+---
+
+```{r}
+# setting a seed
+set.seed(123)
+# Libraries
+library(magrittr)
+library(dplyr)
+```
+
+
+# 1. Generate random data from a given interval - Uniform Distribution
+
+## 1.1 Generating continuous uniform data
+
+```{r}
+# Generate 8 continuous values between 0 and 100
+rand1 <- runif(8, 0, 100)
+rand1
+```
+
+### 1.1.1 Adding syntethic data to a DataFrame
+
+```{r}
+# Create a df
+df <- data.frame(customer_id = 1:5,
+                 customer_name = c("Ted", "Barry", "Eli", "Adam", "Jane"))
+# Adding a column
+df |> 
+  mutate(sale_amount = runif(5, 10, 50) |> round(digits = 2))
+```
+
+### 1.1.2 Visualising the uniform distribution
+
+```{r}
+rand2 <- runif(100000, 0, 100)
+hist(rand2)
+```
+
+
+## 1.2 Generate integer-valued random data - discrete uniform distribution
+
+```{r}
+# Can be used for numerical and categorical values
+some_categories <- c("red", "blue", "green", "orange", "purple")
+rand3 <- sample(0:10, 5, replace=FALSE)
+rand4 <- sample(some_categories, length(some_categories), replace=TRUE)
+rand5 <- sample(c("head","tail"), 5, replace = TRUE)
+rand3
+rand4
+rand5 # coin flip
+```
+
+# 2. Generate random data - Normal distribution
+
+```{r}
+nom1 <- rnorm(n = 200, mean = 5.0, sd = 2.5)
+nom1[1:4]
+```
+
+```{r}
+hist(nom1, breaks = 30)
+```
+
+## 2.1 Calculate the z-score
+
+```{r}
+z_scores <- nom1 |> outliers::scores(type = 'z')
+hist(z_scores, freq = FALSE, breaks = 30)
+```
+
+## 2.2 Q-Q plot
+
+Should appear approximately a straight line if the data are Normal.
+
+```{r}
+# QQ plot
+qqnorm(nom1, main = "Q-Q Plot of Synthetic Data")
+qqline(nom1, col = "red", lwd = 1, lty = 2)
+```
+
+Majority of the data lies on the QQ-plot expect for its tails.
+
+## 2.3 Shapiro Test
+
+Tests the Null Hypothesis that the data are distributed normally. A significant p-value means we must reject the Null Hypothesis and therefore assume that the data are not Normal and vice versa.
+
+	•	If p-value < 0.05 → Reject H₀ → Data not normal
+	•	If p-value ≥ 0.05 → Fail to reject H₀ → Data normal
+
+```{r}
+# Shapiro Wilk Test from the stats package
+shapiro.test(nom1)
+```
+
+Is our significance level 5% (0.05), we would fail to reject the Null Hypothesis and our data is normally distributed.
+
+
+
+
+
+
+
+
+
