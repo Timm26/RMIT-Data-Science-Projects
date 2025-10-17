@@ -1,0 +1,217 @@
+---
+title: "Scanning data"
+output: html_document
+---
+
+```{r, echo = FALSE}
+# Load packages
+library(readr)
+library(haven)
+library(foreign)
+library(magrittr)
+library(here)
+library(tidyr)
+library(dplyr)
+# Get data
+pet1 <- read_csv(here("ZDatasets","pet1.csv"))
+pop_na <- haven::read_sav(here("ZDatasets","population_NA.sav"),
+                          user_na = TRUE)
+terror <- read_csv(here("ZDatasets", "globalterrorismdb_0718distWeek3.csv"))
+```
+
+
+# 1. Missing values and how to identify them
+
+Significantly affects statistical processing as the final result depends on the validity and accuracy of the input data. (Garbage In, Garbage Out)
+
+## 1.1 Identify missing values in R
+
+Identify the count of missing data.
+
+```{r}
+# Show if the dataset contains NA
+paste0("All NA of 'pet1': ",sum(is.na(pet1)))
+paste0("All NA of 'pop_na': ",sum(is.na(pop_na)))
+```
+
+### 1.1.1 Identify the location of NAs in a vector
+
+```{r}
+# Show where the NA appears
+which(is.na(pet1$Reference)) # Showing the row of the column with NA
+pet1$Reference |> head() # Checking 
+```
+
+### 1.1.2 Identifying rows of NA's in a dataset
+
+```{r}
+pet1 |> 
+  filter(is.na(Reference)) |> 
+  select(id, State, Region, Reference, Animal_Name) |> 
+  head()
+```
+
+### 1.1.3 Showing missing values as per column
+
+```{r}
+# Showing NA per column
+cat("NA of pop_na:\n")
+colSums(is.na(pop_na))
+cat("\nNA of pet1:\n") 
+colSums(is.na(pet1))
+```
+
+Finds the variable names that contain missing values:
+
+```{r}
+col_names <- colnames(pet1)[colSums(is.na(pet1)) > 0]
+
+for (i in col_names){
+  temp <- is.na(pet1[i]) |> sum()
+  print(glue::glue("{i} has {temp} missing values"))
+}
+
+cat("\nColumns with NA:",col_names)
+```
+
+
+# 2. Replace and impute missing values
+
+Replace or impute NA to give this missing data sime meaning and usability in the dataset.
+
+## 2.1 Impute missing data
+
+Imputation is the process of estimating or deriving values for fields where data is missing.
+
+```{r, echo = FALSE}
+# Libraries
+library(deducorrect)
+library(deductive)
+library(validate)
+library(Hmisc)
+```
+
+### 2.1.1 Basic missing value imputation techniques
+
+```{r}
+# Create data
+df <- data.frame(month = c(1:3),
+                 staff = c(15000 , 20000, 23000), 
+                 cleaning = c(100, NA, 500), 
+                 housing = c(300, 200, NA),
+                 total = c(NA, 20500, 24000))
+```
+
+Define rules as a `validate` expression.
+
+```{r}
+rules <- validate::validator(staff + cleaning + housing == total,
+                             staff >= 0,
+                             housing >= 0,
+                             cleaning >=0)
+```
+
+Now use `impute_lr` function.
+
+```{r}
+imputed_df <- deductive::impute_lr(df, rules)
+imputed_df
+```
+
+### 2.1.2 Replace missing value(s) with mean, median or mode
+
+```{r}
+# Get data
+x <- data.frame(no = c(1:6),
+                x1 = c(15000 , 20000, 23000, NA, 18000, 21000), 
+                x2 = c(4, NA, 4, 5, 7, 8),
+                x3 = factor(c(NA, "False", "False", "False", "True", "True")))
+x
+```
+
+Impute the mean, median and mode using Hmisc package.
+
+```{r}
+x$x1 <- impute(x$x1, fun = mean)
+x$x2 <- impute(x$x2, fun = median)
+x$x3 <- impute(x$x3, fun = mode)
+x
+```
+
+Now, you can check which values were imputed.
+
+```{r}
+# Check the imputed values
+is.imputed(x$x1)
+is.imputed(x$x2)
+is.imputed(x$x3)
+```
+
+Imputing a variable in a dataframe:
+
+```{r}
+# Get the column
+pet1 |> 
+  filter(is.na(Colour_primary)) |> select(id, State, Region, Animal_Name, Colour_primary)
+```
+
+How to impute variable with their variable's mode:
+
+```{r}
+# Impute with the mode
+pet1$Animal_Name %<>% impute(pet1$Animal_Name, fun = mode)
+pet1$Colour_primary %<>% impute(pet1$Colour_primary, fun = mode)
+pet1 |> 
+  filter(is.na(Colour_primary)) |> select(id, State, Region, Animal_Name, Colour_primary)
+```
+
+How to impute variable with their variable's mean:
+
+```{r}
+# Impute numerical data
+cat("Before imputation:\n")
+pop_na$`@2015`
+pop_na$`@2015`[is.na(pop_na$`@2015`)] <- mean(pop_na$`@2015`, na.rm = TRUE)
+cat("\nAfter imputation:\n")
+pop_na$`@2015`
+
+# Alterntively:
+# pop_na$`@2015` %<>% impute(pop_na$`@2015`, fun = mean)
+```
+
+## 2.2 Exclusion of missing data
+
+```{r}
+glue::glue("Terror rows with NA's: {nrow(terror)}")
+glue::glue("Pet1 rows with NA's: {nrow(pet1)}")
+# Exclude missing values from the dataset
+dat <- terror[complete.cases(terror), ]
+dat2 <- na.omit(pet1)
+# Print results
+glue::glue("Terror rows without NA's: {nrow(dat)}")
+glue::glue("Pet1 rows without NA's: {nrow(dat2)}")
+```
+
+If we want to filter rows where either location or motive are missing
+
+```{r}
+dat <- terror %>% filter(!is.na(location) & !is.na(motive))
+nrow(dat)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
