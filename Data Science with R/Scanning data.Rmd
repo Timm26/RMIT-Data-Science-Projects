@@ -199,11 +199,67 @@ dat <- terror %>% filter(!is.na(location) & !is.na(motive))
 nrow(dat)
 ```
 
+# 3. Techniques to identify special values
 
+What are special values?
 
+Large positive number: 
+```{r inf}
+# Positive number
+val <- 3 ^ 1024
+val
+# Edentify special value
+is.infinite(val)
+is.finite(3)
+```
 
+Large negative number: 
+```{r neg_inf}
+# Negative number
+neg_val <- -3 ^ 1024
+neg_val
+is.infinite(neg_val)
+```
 
+Dividing by zero: 
+```{r div_zero}
+# Division by Zero
+12 / 0
+is.infinite(12/0)
+```
 
+Infinite minus infinite: 
+```{r inf_minus_inf}
+# Subtracting infinite from infinite 
+Inf - Inf
+is.nan(Inf- Inf)
+```
+
+Zero divided by zero: 
+```{r zero_div_zero}
+# Dividing 0 by 0
+0/0
+is.nan(0/0)
+```
+
+## 3.1 Replace special values
+
+```{r}
+# Create a dataframe
+df <- data.frame(col1 = c( 2, 0/0, NA, 1/0, -Inf, Inf),
+                 col2 = c( NA, Inf/0, 2/0, NaN, -Inf, 4))
+df1 <- df
+```
+
+Replace with 0:
+
+```{r}
+df1$col1[is.infinite(df1$col1)] <- 0
+df1$col2[is.infinite(df1$col2)] <- 0
+df1$col1 <- df1$col1 |> replace_na(0)
+df1$col2 <- df1$col2 |> replace_na(0)
+df1
+```
 
 
 
