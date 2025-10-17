@@ -1,0 +1,152 @@
+time,latitude,longitude,depth,mag,magType,nst,gap,dmin,rms,net,id,updated,place,type,horizontalError,depthError,magError,magNst,status,locationSource,magSource
+2019-08-01T01:22:17.497Z,-19.7647,133.916,10,5.4,mb,,87,0.435,0.98,us,us60004yd0,2019-08-01T04:18:41.865Z,"32km WSW of Tennant Creek, Australia",earthquake,5.2,1.9,0.083,49,reviewed,us,us
+2019-07-20T00:18:02.751Z,-18.0599,120.2139,10,4.6,mb,,86,3.511,1.2,us,us70004pg7,2019-07-21T02:10:52.413Z,"214km W of Broome, Australia",earthquake,8.7,2,0.244,5,reviewed,us,us
+2019-07-19T09:21:27.941Z,-18.0691,120.2611,10,4.5,mb,,97,3.114,1.04,us,us70004nrm,2019-07-19T09:40:16.040Z,"209km W of Broome, Australia",earthquake,5.8,2,0.221,6,reviewed,us,us
+2019-07-17T10:20:10.395Z,-18.4512,120.2778,10,4.5,mb,,84,2.742,1.18,us,us70004m50,2019-07-18T10:47:57.059Z,"213km WSW of Broome, Australia",earthquake,7.4,1.9,0.222,6,reviewed,us,us
+2019-07-14T23:01:36.521Z,-18.2789,120.2809,10,5.1,mww,,28,2.911,0.73,us,us70004k8e,2019-07-15T22:53:23.116Z,"209km W of Broome, Australia",earthquake,6.7,1.7,0.071,19,reviewed,us,us
+2019-07-14T15:58:32.648Z,-18.1689,120.3277,10,4.5,mb,,85,3.027,0.95,us,us70004k49,2019-07-24T16:38:10.040Z,"202km W of Broome, Australia",earthquake,6.8,1.9,0.221,7,reviewed,us,us
+2019-07-14T10:58:00.218Z,-18.4311,120.4547,10,4.5,mb,,96,2.798,0.7,us,us70004k0j,2019-07-14T11:16:04.040Z,"195km WSW of Broome, Australia",earthquake,9.7,1.9,0.164,11,reviewed,us,us
+2019-07-14T07:26:36.027Z,-18.0593,120.4412,10,4.9,mb,,42,3.155,0.76,us,us70004jy7,2019-07-14T13:35:25.603Z,"190km W of Broome, Australia",earthquake,6.3,1.9,0.1,31,reviewed,us,us
+2019-07-14T05:39:24.186Z,-18.202,120.3368,10,6.6,mww,,30,2.996,1.1,us,us70004jxe,2019-07-17T23:25:36.869Z,"202km W of Broome, Australia",earthquake,7.1,1.8,0.069,20,reviewed,us,us
+2019-07-02T19:51:46.470Z,-43.6772,123.8879,10,5.5,mww,,41,11.93,0.79,us,us700048vu,2019-07-03T19:55:44.244Z,"South of Australia",earthquake,9.6,1.7,0.073,18,reviewed,us,us
+2019-06-20T14:30:06.493Z,-33.3459,119.5242,10,4.2,mb,,102,1.962,1.17,us,us600043pw,2019-07-20T16:28:43.040Z,"54km WNW of Ravensthorpe, Australia",earthquake,5.8,1.9,0.152,12,reviewed,us,us
+2019-06-15T02:59:40.927Z,-21.4085,121.0848,15.69,4.4,mb,,79,1.165,1.1,us,us6000411a,2019-07-13T21:13:41.040Z,"257km NNE of Newman, Australia",earthquake,4.9,5.3,0.22,6,reviewed,us,us
+2019-05-30T07:38:55.244Z,-21.2953,132.0098,10,4.4,mb,,67,2.563,1.35,us,us70003t2c,2019-06-20T09:58:49.040Z,"292km SW of Tennant Creek, Australia",earthquake,6.9,1.4,0.144,14,reviewed,us,us
+2019-05-30T02:26:52.595Z,-21.3078,132.0076,10,4.9,mww,,40,2.593,0.65,us,us70003t0e,2019-06-28T02:56:17.050Z,"293km SW of Tennant Creek, Australia",earthquake,6.5,1.7,0.083,14,reviewed,us,us
+2019-03-07T20:40:08.897Z,-17.6837,119.4086,10,4.4,mb,,106,3.47,0.95,us,us1000jgki,2019-05-24T21:21:39.040Z,"Northwest of Australia",earthquake,9.7,2,0.239,5,reviewed,us,us
+2019-03-05T14:55:16.110Z,-14.0443,123.806,10,4.2,mb,,114,4.399,0.76,us,us1000jfjp,2019-05-24T21:21:36.040Z,"Northwest of Australia",earthquake,9.6,1.9,0.303,4,reviewed,us,us
+2019-02-20T02:26:54.290Z,-15.5269,129.2734,10,4.3,mb,,141,0.514,0.75,us,us1000j9de,2019-05-11T17:40:30.040Z,"63km ENE of Kununurra, Australia",earthquake,4.8,2,0.238,5,reviewed,us,us
+2019-02-01T08:28:16.760Z,-24.5219,113.0182,10,4.5,mb,,160,2.177,1.14,us,us2000jbqi,2019-04-18T19:09:28.040Z,"73km WNW of Carnarvon, Australia",earthquake,6,1.9,0.15,13,reviewed,us,us
+2018-12-16T14:26:19.620Z,-23.3226,112.4979,10,5.8,mww,,43,1.737,0.76,us,us2000iu4a,2019-02-16T22:29:11.040Z,"206km NW of Carnarvon, Australia",earthquake,6,1.7,0.051,37,reviewed,us,us
+2018-11-21T15:58:50.300Z,-33.2585,136.923,10,4.2,mb,,139,0.852,0.71,us,us1000hxfr,2019-02-02T20:02:31.040Z,"62km NE of Cleve, Australia",earthquake,7.4,1.9,0.215,7,reviewed,us,us
+2018-11-08T21:07:01.300Z,-34.3508,116.8388,10,5.2,mww,,61,1.458,0.97,us,us1000hpej,2019-01-21T16:42:51.040Z,"64km ESE of Manjimup, Australia",earthquake,4.4,1.8,0.089,12,reviewed,us,us
+2018-10-12T16:31:30.360Z,-34.3495,116.8696,10,4.5,mb,,151,1.451,1.26,us,us1000hb52,2018-12-21T21:15:50.040Z,"62km SSW of Kojonup, Australia",earthquake,7.9,1.9,0.121,20,reviewed,us,us
+2018-09-16T04:56:25.520Z,-34.3146,116.759,10,5.3,mww,,42,1.44,1.39,us,us2000hfcw,2018-11-21T18:19:12.040Z,"56km E of Manjimup, Australia",earthquake,8.8,1.7,0.083,14,reviewed,us,us
+2018-09-14T21:51:47.260Z,-32.3666,150.801,10,3.9,mb,,186,2.067,0.39,us,us2000hg1x,2018-11-21T18:19:13.040Z,"11km E of Denman, Australia",earthquake,10.1,2,0.258,4,reviewed,us,us
+2018-08-15T16:45:34.970Z,-31.2533,111.498,10,4.3,mb,,197,4.255,0.9,us,us1000gekr,2018-10-27T16:22:08.040Z,"West of Australia",earthquake,8.8,2,0.169,10,reviewed,us,us
+2018-08-11T19:44:42.450Z,-41.4447,119.9841,10,4.4,mb,,125,7.989,0.61,us,us1000gaiz,2018-10-17T18:11:56.040Z,"South of Australia",earthquake,7.9,1.9,0.155,12,reviewed,us,us
+2018-08-08T14:19:15.940Z,-32.3586,122.4347,10.35,4.1,mb,,84,4.419,0.73,us,us1000g5gz,2018-10-17T18:11:58.040Z,"174km NNE of Esperance, Australia",earthquake,7.2,6.3,0.184,8,reviewed,us,us
+2018-08-08T11:01:39.000Z,-34.877,139.184,13,3.2,ml,,,,0.2,us,us1000g5at,2018-10-17T18:11:56.040Z,"12km WNW of Mannum, Australia",earthquake,8.5,4.7,,,reviewed,aust,aust
+2018-07-23T13:48:30.160Z,-35.9718,144.2409,10,3,ml,,144,1.885,1.14,us,us2000gc5e,2018-10-09T16:43:32.040Z,"49km WNW of Echuca, Australia",earthquake,9.1,2,0.148,6,reviewed,us,us
+2018-07-09T12:45:32.590Z,-33.1295,138.5629,8.55,3.3,ml,,148,2.128,1.27,us,us2000g0qi,2018-10-02T16:40:31.040Z,"8km NNW of Jamestown, Australia",earthquake,8.4,7.5,0.256,2,reviewed,us,us
+2018-07-01T02:27:39.470Z,-33.618,136.7729,10,3.9,ml,,167,1.003,0.39,us,us2000ftar,2018-09-21T16:25:58.040Z,"26km ENE of Cleve, Australia",earthquake,8,2,0.256,2,reviewed,us,us
+2018-06-20T02:54:32.190Z,-32.413,122.4811,8.11,4.5,mb,,74,4.45,0.69,us,us1000ew2s,2018-09-19T15:15:50.040Z,"170km NNE of Esperance, Australia",earthquake,7.3,4.5,0.145,14,reviewed,us,us
+2018-06-18T06:26:49.110Z,-26.0891,121.5452,10,4.5,mb,,58,4.757,0.93,us,us1000eu88,2018-09-19T15:15:47.040Z,"294km NNW of Laverton, Australia",earthquake,8.6,1.9,0.18,9,reviewed,us,us
+2018-06-03T06:58:29.660Z,-42.5481,124.6437,10,4.4,mb,,133,12.061,0.55,us,us1000ehqm,2018-08-28T16:30:39.040Z,"South of Australia",earthquake,6.9,1.9,0.12,20,reviewed,us,us
+2018-05-12T00:50:55.680Z,-28.7372,139.3171,10,4.4,mb,,42,3.697,0.78,us,us1000e750,2018-08-08T15:22:14.040Z,"South Australia",earthquake,8.5,2,0.18,9,reviewed,us,us
+2018-01-10T21:31:56.280Z,-18.867,123.3303,10,4,mb,,168,2.321,1.39,us,us2000cnw0,2018-04-03T01:40:25.040Z,"152km SE of Broome, Australia",earthquake,7.9,2,0.3,3,reviewed,us,us
+2017-08-31T17:45:29.040Z,-25.7102,129.9133,10,4.3,mb,,53,4.161,0.86,us,us2000arkc,2017-11-28T18:33:55.040Z,"Northern Territory, Australia",earthquake,3.9,2,0.239,5,reviewed,us,us
+2017-08-06T04:21:50.710Z,-19.1146,128.0923,4.57,4.9,mb,,39,2.535,0.96,us,us2000a5b3,2017-10-25T00:37:59.040Z,"99km SSE of Halls Creek, Australia",earthquake,3.9,3.4,0.09,39,reviewed,us,us
+2017-07-15T21:27:26.350Z,-26.1405,131.9527,5.75,4.2,mb,,40,3.034,0.89,us,us20009yfa,2017-10-06T23:56:20.040Z,"South Australia",earthquake,6.3,6,0.216,6,reviewed,us,us
+2017-06-09T17:16:14.240Z,-22.2934,121.1969,10,4.5,mb,,81,1.444,1.05,us,us20009msa,2017-08-16T02:42:21.040Z,"191km NE of Newman, Australia",earthquake,6.8,2,0.204,7,reviewed,us,us
+2017-05-28T16:50:23.860Z,-19.8692,133.9267,6.49,4.3,mb,,64,0.394,1.04,us,us20009j83,2017-08-15T02:26:44.040Z,"37km SW of Tennant Creek, Australia",earthquake,5.9,5.4,0.147,13,reviewed,us,us
+2017-04-24T07:37:25.290Z,-32.2936,138.3526,23.93,4,mb,,121,2.004,1.09,us,us10008n8q,2017-07-21T02:32:04.040Z,"30km ENE of Quorn, Australia",earthquake,6.8,10.8,0.232,5,reviewed,us,us
+2017-04-19T08:55:50.170Z,-32.3091,153.1619,10,3.9,mb,,119,2.296,0.9,us,us10008k3m,2017-07-11T01:48:37.040Z,"62km ESE of Forster, Australia",earthquake,5.1,2,0.295,3,reviewed,us,us
+2017-04-13T17:01:21.500Z,-25.6073,129.9183,10.8,4.5,mb,,119,4.109,0.77,us,us10008hbr,2017-07-05T18:09:58.040Z,"Northern Territory, Australia",earthquake,5.1,4.2,0.121,20,reviewed,us,us
+2017-04-13T16:31:06.360Z,-33.5328,148.9562,14.53,4.2,mb,,56,0.894,1.25,us,us10008hbg,2017-07-05T18:09:58.040Z,"23km WSW of Millthorpe, Australia",earthquake,5.5,5.7,0.14,14,reviewed,us,us
+2017-04-04T03:55:54.340Z,-25.9262,128.8547,13.86,4.4,mb,,45,4.885,0.97,us,us10008ghv,2017-06-23T07:26:29.040Z,"228km E of Warburton, Australia",earthquake,8.4,6.3,0.267,4,reviewed,us,us
+2017-03-26T20:00:04.110Z,-31.5062,122.8771,14.98,4.1,mb,,72,4.501,0.68,us,us10008dkr,2017-06-16T23:07:57.040Z,"127km SE of Stoneville, Australia",earthquake,4.9,6.6,0.165,10,reviewed,us,us
+2017-02-01T13:37:54.820Z,-35.0581,139.1956,10,3.9,mb,,111,3.439,1.22,us,us10007wmj,2017-04-27T01:38:41.040Z,"9km NW of Murray Bridge, Australia",earthquake,6.6,2,0.209,6,reviewed,us,us
+2017-01-03T15:30:19.000Z,-30.609,118.455,10,4.5,mb,,,,0.74,us,us10007pgt,2017-03-27T23:53:20.040Z,"98km N of Merredin, Australia",earthquake,5.7,5.5,0.145,14,reviewed,aust,us
+2016-11-10T10:24:51.000Z,-19.853,133.866,5,4.2,mb,,,,1.26,us,us100076lx,2017-02-02T02:21:06.040Z,"41km WSW of Tennant Creek, Australia",earthquake,5,1.9,0.528,1,reviewed,aust,us
+2016-11-06T09:54:31.000Z,-19.106,127.987,10,4.8,mb,,,,1.14,us,us100075ug,2017-02-02T02:21:01.040Z,"95km SSE of Halls Creek, Australia",earthquake,7.2,4.7,0.113,24,reviewed,aust,us
+2016-11-03T16:25:13.000Z,-29.627,137.098,10,4.1,mb,,,,0.3,us,us100076nj,2017-01-24T02:02:16.040Z,"105km N of Roxby Downs, Australia",earthquake,7,3.1,0.212,6,reviewed,aust,us
+2016-08-19T14:39:22.000Z,-25.582,129.806,0,3.9,mb,,,,1.18,us,us10006ggk,2016-11-19T04:58:31.040Z,"Northern Territory, Australia",earthquake,7,2,0.296,3,reviewed,aust,us
+2016-08-18T18:27:35.010Z,-19.6628,148.8618,10,4.3,mb,,146,2.49,0.52,us,us10006gd4,2016-11-15T02:21:53.040Z,"76km ENE of Bowen, Australia",earthquake,5.5,1.9,0.217,6,reviewed,us,us
+2016-08-18T05:30:34.000Z,-19.73,148.92,2,4,ml,,,,0.34,us,us10006emu,2016-11-15T02:21:53.040Z,"78km ENE of Bowen, Australia",earthquake,10.7,6.8,,,reviewed,aust,aust
+2016-08-18T04:30:08.800Z,-19.8352,148.7233,10,5.7,mww,,30,2.335,0.82,us,us10006em9,2017-10-31T12:42:21.340Z,"55km ENE of Bowen, Australia",earthquake,7.1,1.8,,,reviewed,us,us
+2016-08-13T15:31:12.390Z,-23.8567,152.9265,10,4.6,mb,,115,2.255,1.07,us,us10006dl0,2016-11-15T02:21:47.040Z,"124km NNE of Bundaberg, Australia",earthquake,7.8,1.9,0.119,21,reviewed,us,us
+2016-08-06T21:16:33.000Z,-25.572,129.804,0,4.2,mb,,,,1.42,us,us10006cca,2016-10-26T03:10:21.040Z,"Northern Territory, Australia",earthquake,6.1,2,0.373,2,reviewed,aust,us
+2016-07-31T13:45:49.350Z,-19.1824,111.7783,10,4.1,mb,,166,4.138,0.68,us,us10006a4j,2016-10-19T04:51:57.040Z,"Northwest of Australia",earthquake,11,2,0.158,11,reviewed,us,us
+2016-07-16T11:44:49.000Z,-32.501,122.436,0,4,mb,,,,1.32,us,us20006gfc,2016-09-17T01:27:47.040Z,"159km NNE of Esperance, Australia",earthquake,10.2,6.2,0.164,10,reviewed,aust,us
+2016-07-14T10:08:55.000Z,-32.536,122.433,0,4,mb,,,,1.16,us,us20006g48,2016-09-08T01:50:31.040Z,"155km NNE of Esperance, Australia",earthquake,9,7,0.184,8,reviewed,aust,us
+2016-07-08T09:40:50.000Z,-32.458,122.511,0,5.2,mb,,,,1.2,us,us100061v2,2016-09-08T01:50:22.040Z,"166km NNE of Esperance, Australia",earthquake,7.7,3.4,0.072,64,reviewed,aust,us
+2016-06-19T01:54:09.000Z,-35.916,136.45,10,4.5,mb,,,,1.07,us,us200066gl,2016-08-27T02:15:28.040Z,"110km WSW of Kingscote, Australia",earthquake,5.5,1.9,0.127,18,reviewed,aust,us
+2016-06-08T02:01:09.000Z,-32.337,122.386,0,4.2,mb,,,,1.72,us,us200062pn,2016-08-18T00:36:34.040Z,"173km SSE of Stoneville, Australia",earthquake,8.7,1.9,0.158,11,reviewed,aust,us
+2016-06-01T13:00:47.000Z,-32.457,122.481,0,3.9,mb,,,,1.46,us,us200062k6,2016-08-10T22:30:31.040Z,"165km NNE of Esperance, Australia",earthquake,10.1,2,0.194,7,reviewed,aust,us
+2016-05-28T16:38:44.000Z,-32.285,122.396,15,4.9,mb,,,,1.5,us,us20005yv7,2016-08-10T22:30:25.040Z,"168km SSE of Stoneville, Australia",earthquake,5,4.9,0.108,27,reviewed,aust,us
+2016-05-28T15:30:27.000Z,-32.285,122.396,6,4.8,mb,,,,1.35,us,us20005yus,2016-08-10T22:30:25.040Z,"168km SSE of Stoneville, Australia",earthquake,8.1,5,0.111,25,reviewed,aust,us
+2016-05-21T11:08:31.000Z,-25.512,129.894,0,4.1,mb,,,,1.95,us,us20005yh7,2016-08-03T22:33:40.040Z,"Northern Territory, Australia",earthquake,6.1,1.9,0.185,8,reviewed,aust,us
+2016-05-21T09:08:34.000Z,-25.519,129.891,0,4.2,mb,,,,0.97,us,us10005j49,2016-08-03T22:33:40.040Z,"Northern Territory, Australia",earthquake,5.8,1.9,0.186,8,reviewed,aust,us
+2016-05-21T08:46:44.620Z,-25.5802,129.8082,10,4.4,mb,,95,4.186,0.64,us,us20005yh5,2016-08-03T22:33:40.040Z,"Northern Territory, Australia",earthquake,6.5,1.9,0.189,8,reviewed,us,us
+2016-05-21T08:46:18.000Z,-25.601,129.837,0,4.4,mb,,,,1.15,us,us10005j44,2016-08-03T22:33:40.040Z,"Northern Territory, Australia",earthquake,6.5,1.9,0.155,12,reviewed,aust,us
+2016-05-21T07:12:31.000Z,-25.532,129.838,0,4.2,mb,,,,1.05,us,us10005j3t,2016-08-03T22:33:40.040Z,"Northern Territory, Australia",earthquake,8.1,1.9,0.187,8,reviewed,aust,us
+2016-05-20T19:06:09.000Z,-25.574,129.812,0,4.2,mb,,,,2.12,us,us20005y4t,2016-08-03T22:33:39.040Z,"Northern Territory, Australia",earthquake,8.2,5.4,0.2,7,reviewed,aust,us
+2016-05-20T18:14:04.670Z,-25.5655,129.8841,10,6,mww,,24,1.53,1.33,us,us10005iyk,2018-03-13T01:22:51.756Z,"Northern Territory, Australia",earthquake,2.2,1.7,,,reviewed,us,us
+2016-05-16T20:13:20.000Z,-22.904,128.602,10,4.2,mb,,,,1.44,us,us10005hsh,2016-07-22T19:39:09.040Z,"Western Australia",earthquake,4.9,5.5,0.235,5,reviewed,aust,us
+2016-05-10T09:44:38.250Z,-16.3853,118.8669,10,5,mb,,83,4.818,0.81,us,us10005g9r,2016-07-20T18:10:51.040Z,"Northwest of Australia",earthquake,7.7,1.8,0.081,48,reviewed,us,us
+2016-04-28T16:52:44.000Z,-19.77,133.888,10,4.4,mb,,,,1.92,us,us10005c6s,2016-07-08T02:49:27.040Z,"35km WSW of Tennant Creek, Australia",earthquake,4.4,4.8,0.126,19,reviewed,aust,us
+2015-12-25T18:40:07.390Z,-25.5522,154.145,15.31,4.2,mb,,186,2.775,0.61,us,us10004baa,2016-03-18T01:13:01.040Z,"112km ENE of Rainbow Beach, Australia",earthquake,8.6,5.3,0.176,9,reviewed,us,us
+2015-11-03T01:07:44.000Z,-19.784,133.938,11,4.3,mb,,,,0.68,us,us200041hc,2016-01-30T02:11:04.040Z,"31km WSW of Tennant Creek, Australia",earthquake,3.5,5.1,0.16,11,reviewed,aust,us
+2015-10-22T20:45:15.480Z,-25.4034,154.203,10,4.2,mb,,194,2.823,0.91,us,us2000404r,2016-01-22T23:41:10.040Z,"124km ENE of Rainbow Beach, Australia",earthquake,6.6,1.9,0.167,10,reviewed,us,us
+2015-10-13T06:54:57.640Z,-22.5819,120.8975,11.25,4.3,mb,,55,1.4,1.05,us,us10003n84,2016-01-11T21:07:24.040Z,"147km NE of Newman, Australia",earthquake,6.1,5.6,0.168,10,reviewed,us,us
+2015-10-07T20:30:12.490Z,-17.1882,121.8921,10,4.5,mb,,71,3.686,0.87,us,us10003l09,2016-01-04T22:29:35.040Z,"93km NNW of Broome, Australia",earthquake,6.9,1.2,0.131,17,reviewed,us,us
+2015-09-17T02:44:55.000Z,-39.839,142.419,10,4.8,mb,,,,1.09,us,us20003kdr,2015-12-21T23:16:12.040Z,"160km SW of Apollo Bay, Australia",earthquake,7.5,4.6,0.148,14,reviewed,aust,us
+2015-08-14T01:06:55.340Z,-25.4498,154.3241,10,4.3,mb,,73,2.933,1.07,us,us100036b0,2015-11-17T00:13:26.040Z,"133km ENE of Rainbow Beach, Australia",earthquake,9.4,1.8,0.147,13,reviewed,us,us
+2015-08-01T04:46:24.830Z,-25.4093,154.1987,10,5.2,mb,,31,2.819,0.98,us,us10002x2n,2016-09-28T20:49:02.437Z,"123km ENE of Rainbow Beach, Australia",earthquake,7.3,1.7,0.08,60,reviewed,us,us
+2015-08-01T03:38:44.590Z,-25.343,154.3348,9,5.4,mww,,18,2.943,0.87,us,us10002x1x,2016-11-10T21:49:18.081Z,"139km ENE of Rainbow Beach, Australia",earthquake,7,1.7,,,reviewed,us,us
+2015-07-29T23:41:40.420Z,-25.3727,154.2281,9,5.5,mww,,21,2.846,0.71,us,us10002w8v,2018-09-01T02:42:20.510Z,"128km ENE of Rainbow Beach, Australia",earthquake,7.1,1.7,,,reviewed,us,us
+2015-03-10T12:39:49.000Z,-38.046,145.491,0,2.8,ml,,,,1.1,us,us10001lem,2015-05-28T00:48:41.040Z,"3km SW of Pakenham Upper, Australia",earthquake,3,2,,,reviewed,aust,aust
+2015-02-15T15:57:10.000Z,-25.219,151.374,15,4.9,mb,,,,1.1,us,usb000tpj7,2015-05-11T23:20:17.040Z,"51km NNW of Gayndah, Australia",earthquake,6.1,3.2,0.107,31,reviewed,aust,us
+2014-12-03T19:05:10.000Z,-38.102,145.442,10,3.6,mb,,,,0.29,us,usc000t3l2,2015-02-28T02:16:06.040Z,"11km S of Beaconsfield Upper, Australia",earthquake,5.1,7.8,0.25,4,reviewed,aust,us
+2014-12-01T10:25:16.100Z,-21.6482,131.1734,10,4.5,mb,,58,3.224,1.46,us,usb000t1ig,2015-02-24T00:35:15.040Z,"Northern Territory, Australia",earthquake,4.8,1.9,0.54,3,reviewed,us,us
+2014-11-28T03:01:45.000Z,-26.054,112.569,15,4,mb,,,,1.15,us,usc000t5y1,2015-02-24T00:35:08.040Z,"169km SW of Carnarvon, Australia",earthquake,11.2,8.8,0.259,5,reviewed,aust,us
+2014-11-06T22:12:27.880Z,-21.7816,122.2952,0,3.4,mb,,126,2.287,0.95,us,usc000syhj,2015-01-31T02:50:05.040Z,"Western Australia",mining explosion,3.7,2,0.346,2,reviewed,us,us
+2014-10-31T19:15:25.000Z,-30.815,121.232,10,4.5,mb,,,,1.99,us,usc000st80,2015-01-20T09:03:06.040Z,"23km WSW of Kalgoorlie, Australia",earthquake,6.6,1.9,0.118,26,reviewed,aust,us
+2014-09-26T15:38:16.000Z,-20.1,119.534,10,4.4,mb,,,,2.49,us,usb000sgcs,2014-12-20T00:53:59.040Z,"103km ENE of Port Hedland, Australia",earthquake,4.9,1.9,0.202,7,reviewed,aust,us
+2014-09-01T23:01:33.000Z,-19.942,133.872,5,4.3,mb,,,,1.07,us,usc000s8u1,2014-11-29T00:09:24.000Z,"47km SW of Tennant Creek, Australia",earthquake,4.7,3.4,0.202,8,reviewed,aust,us
+2014-08-13T15:22:33.000Z,-33.342,142.146,10,4,mb,,,,1.37,us,usb000s682,2014-11-15T04:07:07.000Z,"84km N of Dareton, Australia",earthquake,,4.7,0.52,7,reviewed,aust,us
+2014-06-09T18:07:35.000Z,-29.901,137.627,9,4,mb,,,,1.99,us,usc000rn36,2014-08-30T17:03:00.000Z,"101km NE of Roxby Downs, Australia",earthquake,,7.2,0.231,5,reviewed,aust,us
+2014-06-04T02:29:09.000Z,-29.867,137.71,13,4.2,mb,,,,1.01,us,usc000raqr,2014-08-30T17:03:00.000Z,"110km NE of Roxby Downs, Australia",earthquake,,4.7,0.125,18,reviewed,aust,us
+2014-05-13T09:44:10.200Z,-18.7196,149.9563,10,4.1,mb,,66,3.749,1.28,us,usc000r95k,2014-08-06T00:55:34.000Z,"231km NE of Bowen, Australia",earthquake,,1.9,0.184,8,reviewed,us,us
+2014-05-04T22:37:54.000Z,-23.005,128.589,10,4.2,mb,,,,1.53,us,usb000r170,2014-07-27T21:51:21.000Z,"Western Australia",earthquake,,2,0.264,4,reviewed,aust,us
+2014-04-30T14:01:03.810Z,-37.7927,111.9215,22.92,4.3,mb,,188,3.395,0.6,us,usb000qwhy,2014-07-27T21:51:13.000Z,"Southwest of Australia",earthquake,,6.7,0.189,9,reviewed,us,us
+2014-04-29T09:54:56.000Z,-32.796,139.541,13,4.6,mb,,,,0.92,us,usb000q3ij,2015-01-30T09:50:31.026Z,"68km ENE of Peterborough, Australia",earthquake,,1.5,0.173,12,reviewed,aust,us
+2014-03-16T03:24:51.000Z,-17.414,124.438,10,3.8,mb,,,,1.29,us,usc000npv7,2014-05-16T21:51:43.000Z,"51km ESE of Derby, Australia",earthquake,,2,0.506,2,reviewed,aust,us
+2014-02-26T00:00:07.000Z,-30.679,121.187,0,4.5,mwr,,,,1.33,us,usc000my8y,2014-05-13T21:36:41.000Z,"27km WNW of Kalgoorlie, Australia",earthquake,,3.3,0.083,14,reviewed,aust,us
+2014-01-13T04:58:48.000Z,-37.759,145.353,15,2.8,ml,,,,1.98,us,usb000m1bj,2015-01-29T18:21:55.114Z,"6km N of Montrose, Australia",earthquake,,1.8,,,reviewed,aust,aust
+2014-01-02T00:21:00.070Z,-37.1496,124.6015,10,4.1,mb,,184,6.972,0.67,us,usc000lvh4,2014-03-07T00:25:54.000Z,"Off the south coast of Australia",earthquake,,2,0.214,9,reviewed,us,us
+2013-08-28T09:15:19.000Z,-34.332,148.28,0,2.6,ml,,,,0.27,us,usb000jd13,2013-11-06T01:33:32.000Z,"2km SW of Young, Australia",earthquake,,8.2,,,reviewed,us_aust,us_aust
+2013-08-24T20:27:48.000Z,-34.307,148.333,3,2.5,ml,,,,0.96,us,usb000jbkv,2013-10-25T20:10:00.000Z,"3km ENE of Young, Australia",earthquake,,8.3,,,reviewed,us_aust,us_aust
+2013-07-20T01:34:20.040Z,-13.365,114.773,12,4.3,mb,13,153,,1.37,us,usp000k25x,2014-11-07T01:51:18.497Z,"northwest of Australia",earthquake,,5.8,,6,reviewed,us,us
+2013-07-18T11:39:11.780Z,-19.777,133.953,10,4.4,mb,24,64,,1.16,us,usp000k24e,2014-11-07T01:51:17.877Z,"Northern Territory, Australia",earthquake,,2.9,,10,reviewed,us,us
+2013-06-22T11:57:48.000Z,-36.725,146.146,11,3.2,ml,5,100,,,us,us2013rta9,2014-11-07T01:51:06.744Z,"24km SE of Benalla, Australia",earthquake,,,,,reviewed,aust,aust
+2013-06-09T14:22:15.000Z,-26.11,131.994,0,5.3,mww,446,21.6,,,us,usc000hjry,2017-10-11T20:34:30.801Z,"Northern Territory, Australia",earthquake,,,,,reviewed,aust,us
+2013-05-01T16:41:49.000Z,-38.113,144.483,10,3.1,ml,11,145.1,,,us,us2013praw,2014-11-07T01:50:42.803Z,"7km N of Leopold, Australia",earthquake,,,,,reviewed,aust,aust
+2013-01-21T13:23:44.350Z,-13.209,123.069,10,4.5,mb,25,80.8,,1.03,us,usp000jynz,2014-11-07T01:49:52.166Z,"northwest of Australia",earthquake,,0,,3,reviewed,us,us
+2013-01-12T20:21:16.000Z,-40.935,145.814,10,3.4,ml,9,162.2,,,us,usp000jyb4,2015-03-24T01:37:25.419Z,"Bass Strait, Australia",earthquake,,,,,reviewed,aust,aust
+2012-11-28T22:35:22.000Z,-27.757,125.943,0,4.2,mb,24,79.4,,,us,usp000jw72,2014-11-07T01:49:27.362Z,"Western Australia",earthquake,,,,1,reviewed,aust,us
+2012-11-09T05:51:42.250Z,-42.732,124.723,10,5.3,mb,230,26.7,,0.86,us,usp000jv8j,2014-11-07T01:49:19.748Z,"south of Australia",earthquake,,,,56,reviewed,us,us
+2012-09-10T06:23:52.000Z,-33.449,151.844,2,3.2,ml,8,136.2,,,us,usp000js30,2015-03-24T02:07:51.155Z,"near the southeast coast of Australia",earthquake,,,,,reviewed,aust,aust
+2012-07-20T09:11:31.000Z,-38.282,146.164,13,4.6,mb,17,111.2,,,us,usp000jp7g,2015-03-24T01:31:23.197Z,"near the southeast coast of Australia",earthquake,,,,4,reviewed,aust,us
+2012-06-22T09:16:04.000Z,-34.229,148.713,10,3.8,ml,7,134.1,,,us,usp000jn39,2015-03-24T02:09:01.414Z,"New South Wales, Australia",earthquake,,,,,reviewed,aust,aust
+2012-06-19T10:53:29.000Z,-38.304,146.2,10,5.2,mb,178,43.2,,,us,usp000jmyx,2017-10-11T20:08:48.925Z,"near the southeast coast of Australia",earthquake,,,,37,reviewed,aust,us
+2012-06-08T11:32:39.000Z,-30.748,150.4,0,4.1,ml,7,159.2,,,us,usp000jmh7,2014-11-07T01:48:02.047Z,"New South Wales, Australia",earthquake,,,,,reviewed,aust,aust
+2012-06-08T11:31:00.000Z,-30.759,150.413,0,4,mwr,27,78.6,,,us,usp000jmh6,2016-01-04T23:29:31.572Z,"New South Wales, Australia",earthquake,,,,,reviewed,aust,us
+2012-05-27T09:27:11.980Z,-40.68,155.911,14.7,4.7,mb,100,43.3,,1.05,us,usp000jkzn,2014-11-07T01:47:53.861Z,"southeast of Australia",earthquake,,10.1,,16,reviewed,us,us
+2012-04-19T19:09:16.000Z,-35.231,148.603,4,3.7,ml,17,60.8,,,us,usp000jj8f,2015-03-24T01:28:34.849Z,"New South Wales, Australia",earthquake,,,,,reviewed,aust,aust
+2012-03-23T09:25:14.000Z,-26.163,131.955,7,5.3,mwc,315,27.2,,,us,usp000jgnw,2017-10-11T20:02:15.660Z,"South Australia",earthquake,,,,,reviewed,aust,gcmt
+2012-03-16T11:24:36.000Z,-26.174,131.824,15,4.3,ml,15,86.8,,,us,usp000jgb9,2014-11-07T01:47:15.775Z,"South Australia",earthquake,,,,,reviewed,aust,aust
+2011-12-05T19:10:00.000Z,-21.51,114.42,15,5.2,mwc,85,42.3,,,us,usp000jbvf,2017-04-13T22:27:01.323Z,"Western Australia",earthquake,,,,,reviewed,aust,gcmt
+2011-10-28T09:08:38.140Z,-40.609,126.596,10,4.8,mb,37,63.4,,1.12,us,usp000ja0t,2014-11-07T01:46:11.877Z,"south of Australia",earthquake,,,,13,reviewed,us,us
+2011-10-18T15:52:25.000Z,-35.034,138.671,17,3.3,ml,6,197.6,,,us,usp000j9h0,2015-03-24T01:40:27.037Z,"near the coast of South Australia",earthquake,,,,,reviewed,aust,aust
+2011-10-15T10:38:10.000Z,-32.286,138.819,0,4.6,mb,10,100,,,us,usp000j9cf,2014-11-07T01:46:06.879Z,"near the coast of South Australia",earthquake,,,,1,reviewed,aust,us
+2011-09-17T16:28:29.000Z,-20.214,147.614,5,4.3,mb,16,151.1,,,us,usp000j86z,2015-03-24T02:02:45.228Z,"Queensland, Australia",earthquake,,,,3,reviewed,aust,us
+2011-09-04T11:15:11.000Z,-33.079,138.713,2,4.1,mb,15,168.6,,,us,usp000j7kk,2014-11-07T01:45:50.064Z,"near the coast of South Australia",earthquake,,,,3,reviewed,aust,us
+2011-07-14T05:51:36.000Z,-20.865,120.356,12,4,mb,32,57.2,,,us,usp000j4uw,2014-11-07T01:45:21.721Z,"Western Australia",earthquake,,,,6,reviewed,aust,us
+2011-07-05T09:16:26.000Z,-38.412,145.806,6,3.7,ml,11,130.2,,,us,usp000j467,2015-03-24T01:18:46.767Z,"near the southeast coast of Australia",earthquake,,,,,reviewed,aust,aust
+2011-07-05T02:37:16.000Z,-38.404,145.888,0,3.3,ml,4,135.1,,,us,usp000j45w,2015-03-24T02:16:23.193Z,"near the southeast coast of Australia",earthquake,,,,,reviewed,aust,aust
+2011-07-05T01:32:11.000Z,-38.412,145.839,2,4.4,mb,24,116.1,,,us,usp000j45q,2015-03-24T01:18:43.852Z,"near the southeast coast of Australia",earthquake,,,,6,reviewed,aust,us
+2011-06-01T03:29:04.000Z,-37.49,142.425,2,3.8,ml,12,163.1,,,us,usp000j2h9,2014-11-07T01:44:58.629Z,"near the southeast coast of Australia",earthquake,,,,,reviewed,aust,aust
+2011-05-20T20:03:29.000Z,-23.46,119.332,9,4.7,mb,50,64.7,,,us,usp000j1wq,2015-03-24T02:07:53.678Z,"Western Australia",earthquake,,,,17,reviewed,aust,us
+2011-05-07T05:23:36.000Z,-17.735,122.881,10,4.4,mb,15,111.7,,,us,usp000j155,2014-11-07T01:44:46.590Z,"Western Australia",earthquake,,,,3,reviewed,aust,us
+2011-04-17T18:41:18.460Z,-19.921,113.73,10,5.3,mwc,97,42.7,,1.11,us,usp000j05d,2015-03-24T01:16:41.161Z,"northwest of Australia",earthquake,,,,,reviewed,us,gcmt
+2011-04-16T07:06:52.000Z,-20.17,147.679,0,4,mb,19,153.5,,,us,usp000j02d,2015-03-24T01:16:38.384Z,"Queensland, Australia",earthquake,,,,2,reviewed,aust,us
+2011-04-16T05:31:18.000Z,-20.085,147.764,7,5,mwr,127,24.2,,,us,usp000j026,2017-04-13T22:26:20.667Z,"Queensland, Australia",earthquake,,,,,reviewed,aust,us
+2011-04-08T06:05:24.590Z,-42.46,120.156,10,5,mwc,75,52.8,,1.09,us,usp000hzh5,2014-11-07T01:44:30.313Z,"south of Australia",earthquake,,,,,reviewed,us,gcmt
+2011-03-15T06:07:59.000Z,-17.327,146.253,0,3.6,ml,9,145,,,us,usp000hxab,2014-11-07T01:44:09.372Z,"Queensland, Australia",earthquake,,,,,reviewed,aust,aust
+2011-02-21T21:59:36.000Z,-20.903,135.419,0.6,4,mwr,65,50.9,,,us,usp000huvh,2014-11-07T01:43:41.999Z,"Northern Territory, Australia",earthquake,,,,,reviewed,aust,us
+2010-10-10T02:30:18.000Z,-32.902,139.961,0,4.5,mb,21,94.4,,,us,usp000hmxb,2014-11-07T01:42:41.241Z,"near the coast of South Australia",earthquake,,,,3,reviewed,aust,us
+2010-09-29T09:09:25.000Z,-29.568,143.752,0,4.2,mb,15,44.9,,,us,usp000hmb3,2014-11-07T01:42:31.701Z,"New South Wales, Australia",earthquake,,,,1,reviewed,aust,us
+2010-08-13T01:23:26.030Z,-38.036,111.579,10,4.2,mb,14,127,,1.27,us,usp000hj11,2014-11-07T01:42:13.793Z,"southwest of Australia",earthquake,,,,2,reviewed,us,us
+2010-07-30T21:29:22.000Z,-32.175,138.141,10,4.2,mb,16,88,,,us,usp000hh6e,2014-11-07T01:42:04.877Z,"near the coast of South Australia",earthquake,,,,2,reviewed,aust,us

@@ -14,6 +14,7 @@ library(openxlsx)
 # Import some datasets
 country <- read_csv(here("ZDatasets", "CountryRegionDataset.csv"))
 terror  <- read_csv(here("ZDatasets", "globalterrorismdb_0718distWeek3.csv"))
+starwars <- dplyr::starwars
 ```
 
 
@@ -69,8 +70,6 @@ flu |>
 ## 1.3 Create a new variable
 
 ```{r}
-# Get data
-starwars <- starwars
 # Number of variables
 starwars |> ncol()
 ```
@@ -138,6 +137,19 @@ starwars |>
   head()
 ```
 
+## 1.5 Drop and rename variables
+
+```{r}
+# Show the current first 3 variable names of starwars
+paste0("Before any change: ",names(starwars)[1:3])
+
+# Using select to drop variables
+starwars <- starwars |>  
+  select(-name) |> 
+  rename(Height = height, Mass = mass)
+# Show changes
+paste0("After any change: ",names(starwars)[1:3]) # name is gone and height and mass now as titles
+```
 
 
 # 2. Join, mutate and merge datasets
@@ -192,11 +204,128 @@ intersect(airlines |> names(),
           airports |> names())
 ```
 
+## 2.4 Merging datasets
+
+```{r}
+# Get data
+auseq <- read.csv(here("ZDatasets","AusEQ2010.csv"))
+quakes <- datasets::quakes
+# Prepare the quakes dataset for merging
+quakes <- quakes |>  select(-stations) |> rename(latitude= lat, longitude = long)
+auseq <- auseq |>  select(latitude, longitude, depth, mag)
+auseq |> head()
+quakes |> tail()
+```
+
+### 2.4.1 Using bind_rows()
+
+Adds the rows of dataset 2 to dataset 1 while matching the columns. If columns don't exist it will fill them with NaN.
+
+```{r}
+# Merging using bind_rows
+comb_quakes <- bind_rows(auseq, quakes)
+comb_quakes |> head()
+comb_quakes |> tail()
+```
+
+# 3. String Manipulation functions
+
+## 3.1 Create a variable using concatentation
+
+- chartr()
+- gsub()
+
+### 3.1.1 Single character replacement
+
+```{r}
+# chartr to replace a single character
+x <- "This is A string"
+chartr(old = "A", new = 'a',x)
+chartr(old = "is", new = "as", x) # replaces each i with a and each s with s
+```
+
+Changing all flight number 1545 to 1595:
+
+```{r}
+flights$flight |> head()
+flights$flight <- flights$flight |> gsub(pattern = 1545, replacement = 1595) |> as.numeric() # gsub will change the type to an object
+flights$flight |> head()
+```
+
+## 3.2 Replace character variables
+
+- substr()
+- strsplit()
+
+### 3.2.1 Using substr()
+
+Replaces a pre-defined sequence of characters.
+
+```{r}
+alphabet <- paste(LETTERS, collapse = "")
+alphabet
+```
+
+```{r}
+# Extract the 18th to 24th character
+substr(alphabet, start = 18, stop = 24) <- "RRRRRR"
+alphabet
+```
+
+Calling `substr()` on a dataframe column. Creating `sex` abbreviations.
+
+```{r}
+starwars$sex_short <- substr(starwars$sex, start = 1, stop=1)
+starwars |> select(sex, sex_short) |> head()
+```
 
 
+# 4. Summarise statistics
 
+More and deeper exposure to dpylr's `summarise()` function in R. It produces summary statistics of an entire dataset and works great in combination with `group_by()`.
 
+Useful functions that can be used inside `summarise()`: `min()`, `max()`, `mean()`, `median()`, `sum()`, `var()`, `sd()`, `first()`, `last()`, `nth()`, `n()`, `n_distinct()`.
 
+All functions take a vector of values and return a single summary value.
 
+```{r}
+# Mean delay
+flights |> 
+  summarise(delay = mean(dep_delay, na.rm = TRUE))
+```
 
+```{r}
+# Summary statistics grouped by factor or character
+flights |> 
+  group_by(dest) |> 
+  summarise(mean_delay = mean(dep_delay, na.rm = TRUE), 
+            flights = n()) |> head() # Delay by destination
+```
+
+The below creates summary statistics for magnitude, database `quakes`.
+
+```{r}
+magnitude_stats <- quakes %>% 
+  summarise(Min_Magnitude = min(mag, na.rm = TRUE), 
+            Q1_Magnitude = quantile(mag, probs = 0.25, na.rm = TRUE), 
+            Median_Magnitude = median(mag, na.rm = TRUE), 
+            Q3_Magnitude = quantile(mag, probs = 0.75, na.rm = TRUE), 
+            Max_Magnitude = max(mag, na.rm = TRUE), 
+            Mean_Magnitude = mean(mag, na.rm = TRUE), 
+            SD_Magnitude = sd(mag, na.rm = TRUE), 
+            Missing_Magnitude = sum(is.na(mag)), 
+            n = n())
+magnitude_stats
+```
+
+Getting the total number of killed or injured:
+
+```{r}
+# Show total killed or injured
+terror |> 
+  group_by(country_txt) |> 
+  summarise(total_killed = sum(nkill, na.rm = TRUE),
+                    total_wounded = sum(nwound, na.rm = TRUE)) |> 
+  arrange(desc(total_killed))
+```
 
