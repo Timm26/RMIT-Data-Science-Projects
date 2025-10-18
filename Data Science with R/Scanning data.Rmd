@@ -340,9 +340,23 @@ versicolor |> head()
 ```{r}
 results <- MVN::mvn(data = versicolor, 
                multivariateOutlierMethod = "quan", 
-               showOutliers = TRUE)
+               showOutliers = TRUE,
+               showNewData = TRUE)
 results
 ```
+
+```{r}
+# Remove the outliers
+clean <- results$newData
+outliers <- results$multivariateOutliers
+results_clean <- MVN::mvn(data = clean, 
+               multivariateOutlierMethod = "quan", 
+               showOutliers = TRUE,
+               showNewData = TRUE)
+results_clean
+```
+
+Outliers are saved in the object `outliers`.
 
 ## 4.2 Apply univariate outlier detection and imputation
 
@@ -376,28 +390,17 @@ boxplot(iris$Sepal.Width)
 
 ## 4.3 Delete Outliers
 
+```{r}
+# Before the exclusion of any outliers
+diamonds$carat |> boxplot(main = "With Outliers")
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```{r}
+# Locate the outliers using z-score approach 
+z.scores <- diamonds$price |> 
+  outliers::scores(type = "z")
+# Remove these outliers
+carat_clean <- diamonds$carat[-which(abs(z.scores) > 3)]
+carat_clean |> boxplot(main = "Outliers removed")
+```
 
