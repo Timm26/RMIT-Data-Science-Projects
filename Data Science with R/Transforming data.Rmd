@@ -1,0 +1,310 @@
+---
+title: "Transforming data"
+output: html_document
+---
+
+```{r, echo = FALSE}
+library(tidyverse)
+library(here)
+library(infotheo)
+library(forecast)
+# Get data
+salary <- read_csv(here("ZDatasets","salary.csv"))
+left_skewed <- read_csv(here("ZDatasets", "left_skewed1.csv")) 
+left_skewed <- left_skewed[, -1]
+right_skew <- read_csv(here("ZDatasets", "right_skewed1.csv"))
+right_skew <- right_skew$x
+```
+
+
+- Change the scale of a variable
+- Standardise the values of a variable
+- Transform complex non-linear relationships
+- Reduce skewness and/or heterogeneity of variances
+- Apply logarithmic transformation can result in a more effective visual display of the data
+- Data transformation techniques: Mathematical & Box-Cox transformation
+
+```{r}
+# Histogram of salary
+hist(salary$salary, main = "Histogram of salary", 
+     xlab = "Salary")
+```
+
+
+# 1. Data transformation via mathematical operations
+
+- Log transformation (Reduces *right*-skewed data)
+- Square root transformation (Reduces *right*-skewed data)
+- Sqare transformation (Reduces *left*-skewed data)
+- Reciprocal transformation (Reduces *right*-skewed data)
+- Power transformation (Reduces *left*-skewed data)
+
+## 1.1 Log transformation
+
+- Compress high values and spreads low values by expressing the values as orders of magnitude.
+- It is the inverse of an exponential, so it is useful in helping to linearise a variable that grows exponentially
+
+- base 10 $\log_{10}$
+- base e $\log_{e}$
+
+```{r}
+# Base 10 logarithmic transformation
+log_sal <- log10(salary$salary)
+hist(log_sal, main = "Histogram of base 10 log salary", 
+     xlab = "Base 10 log of Salary")
+```
+
+The histogram is still quite skewed, but appears less skewed than the original data.
+
+```{r}
+# Base e logarithmic transformation
+ln_sal <- log(salary$salary)
+hist(ln_sal, 
+     main = "Histogram of the natural logarithm of salary", 
+     xlab = "Natural log of salary")
+```
+
+## 1.2 Square root transformation
+
+- Can be applied to zero values.
+- $\sqrt{}$ ; in R `sqrt()`
+
+```{r}
+# Square root
+sqrt_sal <- sqrt(salary$salary)
+hist(sqrt_sal, 
+     main = "Histogram of the Square Root of Salary", 
+     xlab = "Square Root of Salary")
+```
+The square root transformation has reduced the skewness in the salary distribution just a bit, however it didn’t completely improve the symmetry of the salary distribution.
+
+## 1.3 Square transformation
+
+- Has a moderate effect on distribution shape and it can be used to reduce left skweness.
+- $x^2$
+
+```{r}
+# Left-skewed dataset before the transformation
+hist(left_skewed$x, main = "Histogram of left-skewed data",
+     xlab = "left-skewed x")
+```
+
+Square transformation:
+
+```{r}
+# Apply the transformation
+sqrt_left_skew <- left_skewed$x^2
+hist(sqrt_left_skew, main = "Histogram of Square Transformation of left-skewed dataset", 
+     xlab = "Square root of left-skewed x value")
+```
+
+Still quite skewed, but not as bad as the original data. A different power, greater than two, might perform better.
+
+## 1.4 Reciprocal transformation
+
+- Very strong transformation with a drastic effect on the distribution shape
+- Compresses large values to smaller values
+- $\frac{1}{x}$ or $x^{-1}$
+
+```{r}
+# Original dataset
+hist(right_skew, 
+     main = "Histogram of right-skewed dataset", 
+     xlab = "Right-skewed x value")
+```
+
+Apply transformation:
+
+```{r}
+# Reciprocal transformation
+right_skew_recip <- 1 / right_skew
+hist(right_skew_recip)
+```
+The data is almost perfect normally distributed now.
+
+# 2. Box-cox transformation
+
+- can be applied to *right*-skewed data
+- type of power transformation, involves raising the data to some power
+- is the data negative values, a constant is first added to the data so that all values are non-negative
+- goal is to make our data as close to normally distributed as possible
+
+- Choose Lambda:
+
+$λ = 1$ - No change - Data stays - the same
+$λ = 0.5$ - Square root - Reduces right skew
+$λ = 0$ - Log transform - Strongly reduces right skew
+$λ = –1$ - Reciprocal - Very strong right-skew reduction
+
+$$^{(\lambda)} =\begin{cases}\dfrac{y^{\lambda} - 1}{\lambda}, & \text{if }\lambda \neq 0 \\\ln(y), & \text{if } \lambda = 0\end{cases}$$
+	•	$y^{(\lambda)}$: transformed value of y
+	•	$\lambda$: transformation parameter (estimated to best approximate normality)
+	•	$\ln(y)$: natural log of y (the special case when $\lambda = 0$)
+
+```{r}
+# Apply boxcox transformation - lambda "auto"
+boxcox_sal <- BoxCox(salary$salary, lambda = "auto")
+lambda <- attr(boxcox_sal, which = "lambda") # Extract the lambda value used
+```
+
+Visualise the result:
+
+```{r}
+hist(boxcox_sal, 
+     main = bquote("Histogram of Box-Cox Transformed Salary (" ~ lambda == -0.9999242 ~ ")"), 
+     xlab = "Transformed salary") 
+```
+
+# 3. Data Normalisation and Standardisation
+
+Some statistical analysis methods are sensitive to the scale of the variables. There can be instances where values for one variables could range between 1 and 10 while values for another variable range from 1 to 10,000,000. The impact on a response variable by a predictor variable can appear far greater simply because of the range.
+
+- Doesn't change the shape of the data
+- Can shift the distribution by subtracting a number, and/or increase or decrease its spread.
+
+```{r}
+# Create a df
+df <- data.frame(x1 = c(10, 20, 40, 50, 10), 
+                 x2 = c(1000, 5000, 3000, 2000, 1500), 
+                 x3 = c(0.1, 0.12, 0.11, 0.14, 0.16), 
+                 x4 = c(2.5, 4.2, 3.2, 4.5, 3.8))
+df
+```
+
+
+### 3.1 Centring and scaling
+
+- Centring involes the subtraction of the variables average from the data.
+$y' = y - \bar{y}$
+
+```{r}
+# Apply mean-centring scale
+centre_x <- scale(df, center = TRUE, scale = FALSE)
+centre_x
+```
+
+- Scaling involves the division of the values to their standard deviation (or root-mean-square value).
+$y' = \frac{y}{SD_y}$
+
+```{r}
+# Scale (without centring) to the data frame
+scale_x1 <- scale(df, center = FALSE, scale = TRUE)
+scale_x1
+```
+
+
+### 3.2 z-score standardisation
+
+The means of observations are first subtracted from each individual data point, then divided by the standard deviation of all points. The resulting transformed data values would have a mean of zero and standard deviation of one.
+$z = \frac{(y - \bar{y})}{SD_y}$
+
+```{r}
+# Apply z-score transformation
+z_x <- scale(df, center = TRUE, scale = TRUE)
+z_x
+```
+
+
+### 3.3 Min-max normalisation
+
+$$y' = \frac{y - y_{min}}{y_{max} - y_{min}}$$
+
+The data is scaled to a fixed range, usually 0 and 1.
+
+```{r}
+# Define the min-max function
+min_max_norm <- function(x, na.rm = FALSE){
+  (x - min(x, na.rm = na.rm)) / (max(x, na.rm = na.rm) - min(x, na.rm=na.rm))}
+
+# Apply the function
+df_norm <- lapply(df, min_max_norm)
+as.data.frame(df_norm)
+```
+
+
+# 4. Apply common approaches to data discretisation
+
+- Sometimes you may need to discretise numeric values, as analysis methods require discrete values as input or output variables (e.g. most versions of Naive Bayes and CHAID analysis; also segmentation analysis)
+- Binning or discretisation methods transform numerical variables into categorical counterparts
+
+## 4.1 Equal-width binning
+
+- This method involves assigning the numerical values of a variable into a series of *equal-sized intervals* / bins
+- Each bin spans the same width on the numeric scale, even if the number of data points in each bin differs (Bin 1: 4.9–5.6 / Bin 2: 5.6–6.3 / Bin 3: 6.3–7.0)
+- The variable is divided into $n$ intervals of equal sizes
+$$w = \frac{\left(y_{max} - y_{min} \right)}{n}$$
+
+Let's apply equal width binning of this iris subset:
+
+```{r}
+# Get the subset
+versicolor_sl <- iris |> 
+  filter(Species == "versicolor") |> 
+  dplyr::select(Sepal.Length)
+```
+
+Apply equal-width binning to the `Sepal.Length` variable:
+- total bins are: `nbins = sqrt(length(x))`
+- `nbins` to decide bins manually
+
+```{r}
+ew_binned <- infotheo::discretize(versicolor_sl, disc = "equalwidth", nbins=3)
+names(ew_binned) <- "sepal_length_binned"
+versicolor_sl %<>% bind_cols(ew_binned) 
+versicolor_sl |> head() 
+```
+
+
+## 4.2 Equal-depth binning
+
+This method uses equal-frequency discretisation.
+- The data are sorted and then split into bins that each bin contains roughly the same number of observations
+- Bin widths are *unequal*, but *frequencies are balanced*
+- Example: if you have 50 values, each bin might contain 16-17 values. If most values are between 5.5 and 6.0, the middle bin will have a narrower width to capture that dense region
+
+```{r}
+# Get data
+versicolor_sl <- iris |> 
+  filter(Species == "versicolor") |> 
+  dplyr::select(Sepal.Length)
+```
+
+Apply equal-depth binning:
+
+```{r}
+# equal-depth binning
+ed_binned <- infotheo::discretize(versicolor_sl, disc = "equalfreq")
+names(ed_binned) <- "Sepal.Length.binned"
+versicolor_sl |> 
+  bind_cols(ed_binned) |> head()
+```
+
+
+# 5. Feature selection and extraction
+
+Most ML algorithms and regression techniques are sensitive to the number of dimensions in the mode. 'Curse of dimensionality' might apply if the dataset has to many features. This high dimensionality will increase the computational complexity and increase the risk of overfitting.
+
+## 5.1 Feature selection
+
+You try to find a subset of the original set of variables, or the features which are most representative of the data.
+
+### 5.1.1 Feature filtering
+
+- Redundant features are filtered out and the ones that are most useful are selected
+- Includes removing features with zero and near-zero variance, where two features are highly correlated, remove one of them
+
+### 5.1.2 Feature ranking
+
+- Ranking features according to an importance criterion and selecting those that are above a defined threshold.
+- Ranked according to a statistical criterion (chi-square test, correlation test, entropy-based test, random forest)
+
+## 5.2 Feature extraction
+
+- Reduces the quantity of data in high-dimensional space to a lower-dimensional space bu creating new combinations of attributes.
+- One of the most commonly used approach to extract features is principal component analysis (PCA)
+
+### 5.2.1 PCA
+
+- Unsupervised algorithm that creates linear combinations of the original feature
+- The extracted components are ranked in order of their 'explained variance' (first principal component explains the most variance in the data, secind principal component explains the second-most variance and so on)
+
