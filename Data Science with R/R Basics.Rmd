@@ -96,6 +96,79 @@ df2[2, c(1,4)]
 df2[c("subj2", "subj3"), c("number", "transaction")]
 ```
 
+# 5. Date and Timezones
+
+Basic date creation:
+
+```{r}
+# Create a date
+dates <- c("2020-01-01", "2019-06-30", "2012-04-27", "2008-08-08", "2010-11-19")
+date1 <- as.Date(dates)
+date1
+date2 <- format(as.Date(dates), format = "%Y/%m/%d")
+date2
+```
+
+
+## 5.1 Date arithmetic
+
+### 5.1.1 Create year, minutes, hours, etc
+
+Create years:
+
+```{r}
+# Get the current year
+curr_year <- Sys.Date() |> 
+  year() |> 
+  as.integer()
+# Create even years
+even_year <- seq(from = 1980, to = curr_year, by = 2)
+even_year
+```
+
+Create hours:
+
+```{r}
+# Create hours
+hour_list <- seq(ymd_hm("2000-1-1 9:00"), ymd_hm("2000-1-1 12:00"), by="hour")
+hour_list
+```
+
+Create months:
+
+```{r}
+month_list <- seq(ymd_hm("2000-1-1 9:00"), ymd_hm("2000-12-1 9:00"), by="month")
+month_list |> head()
+```
+
+## 5.2 Calculate time intervals
+
+```{r}
+# Calculate the days since first of Jan 2000
+days_spent <- today() - ymd(20000101)
+days_spent
+# Calculate the week since first of Jan 2000
+difftime(today(), ymd(20000101), units = "weeks")
+```
+
+## 5.3 duration()
+
+```{r}
+# Create a new duration represented in seconds
+duration(1)
+# Create durations for minutes
+dminutes(1)
+# Create durations in hours
+dhours(1)
+# Create durations in years
+dyears(1)
+# Add/subtract durations from date/time object
+x <- ymd_hms("2000-01-01 12:00:00")
+x + dhours(10) + dminutes(33) + dseconds(54)
+```
+
+
+
 
 
 

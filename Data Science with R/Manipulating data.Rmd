@@ -8,6 +8,7 @@ library(dplyr)
 library(magrittr)
 library(readr)
 library(openxlsx)
+library(readxl)
 ```
 
 ```{r}
@@ -326,6 +327,117 @@ terror |>
   group_by(country_txt) |> 
   summarise(total_killed = sum(nkill, na.rm = TRUE),
                     total_wounded = sum(nwound, na.rm = TRUE)) |> 
-  arrange(desc(total_killed))
+  arrange(desc(total_killed)) |> head()
 ```
+
+
+# 5. Manipulating time and date
+
+Main packages: `{stringr}` `{lubridate}`.
+
+```{r}
+library(stringr)
+library(lubridate)
+```
+
+
+## 5.1 Get time and date
+
+Accessing current time and date: `Sys.timezone()`, `Sys.Date`, `Sys.time()`
+
+```{r}
+# Get time zone information
+Sys.timezone()
+# Get date information
+Sys.Date()
+# Get time
+Sys.time()
+# Get current time using lubridate
+lubridate::now()
+```
+
+{lubridate} can automatically recognise the common separators used when recording dates: `now()`, `ymd()`, `ydm()`, `mdy()`, `dmy()`, `hm()`, `ymd_hms()`
+
+```{r}
+z <- c("08.03.2018", "29062017", "23/03/2016", "30-01-2018")
+z <- dmy(z)
+z
+```
+
+## 5.2 Extract and manipulate date variables
+
+```{r}
+# Data
+flights <- nycflights13::flights
+flights_new <- flights |> 
+  select(year, month, day, hour, minute)
+flights_new |> head()
+```
+
+Use make_date() and make_datetime() for date-times:
+
+```{r}
+# make_datetime()
+flights_new %<>%
+  mutate(departure = make_datetime(year, month, day, hour, minute))
+flights_new |> head()
+```
+
+To extract the year or month, wday:
+
+```{r}
+# Extract the year
+flights_new$departure |> year() |> head()
+# Extract the month
+flights_new$departure |> month(label = TRUE, abbr = TRUE) |> head()
+# Extract the weekday
+flights_new$departure |> wday() |> head()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
