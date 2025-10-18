@@ -17,6 +17,7 @@ pet1 <- read_csv(here("ZDatasets","pet1.csv"))
 pop_na <- haven::read_sav(here("ZDatasets","population_NA.sav"),
                           user_na = TRUE)
 terror <- read_csv(here("ZDatasets", "globalterrorismdb_0718distWeek3.csv"))
+diamonds <- read_csv(here("ZDatasets", "Diamonds.csv"))
 ```
 
 
@@ -260,6 +261,135 @@ df1$col1 <- df1$col1 |> replace_na(0)
 df1$col2 <- df1$col2 |> replace_na(0)
 df1
 ```
+
+# 4. Handle outliers
+
+Findings from a statistical analysis can be significantly altered by outliers in the data set. Don't just remove them, identify why they exist (Extreme Value, Error, Rare Occasion)
+
+Types of Outliers:
+- Data entry errors
+- Measurement errors
+- Intentional error
+- Data processing error
+- Sampling error
+
+## 4.1 Outlier Detection Methods
+
+### 4.1.1 Univariate
+
+- Non-parametric (e.g. box plot)
+
+```{r}
+# Boxplot
+diamonds$carat |> 
+  boxplot(main = "Box Plot of Diamond Carat", ylab = "Carat", col = "grey")
+```
+
+- Parametric (e.g. Z-Score)
+
+Z-Scores is a distnace-based parametric method to detect univariate outliers. 
+
+$$z_i = \frac{\left(x_i-\bar{x} \right)}{s}$$
+
+In the equation, $x_i$ denotes the values of observations, $\bar{x}$ and $s$ are the sample mean and standard deviation, respectively. Data must be normal distributed!
+
+```{r}
+hist(diamonds$depth)
+```
+
+```{r}
+# Calculate z-scores
+z_scores <- diamonds$depth |> 
+  outliers::scores(type = "z")
+z_scores |> summary()
+```
+
+```{r}
+hist(z_scores, freq = FALSE, breaks = 30)
+x <- seq(-15, 15, by = 0.001) # Base this sequence start and end point on the x-axis length 
+lines(x = x, y = dnorm(x), col = "red")
+```
+
+### 4.1.2 Multivariate
+
+- Non-parametric (e.g. bivariate box plot, scatter plot)
+
+```{r}
+# Bivariate boxplot
+boxplot(diamonds$carat ~ diamonds$cut, #diamonds carat by diamonds cut
+        main = "Diamond carat by cut", ylab = "Carat", xlab = "Cut")
+```
+
+```{r}
+# Bivariate Scatterplot
+diamonds %>% 
+  plot(carat ~ depth, # diamonds caret by depth 
+       data = ., 
+       ylab = "Carat", xlab = "Depth", main = "Carat by depth")
+```
+
+- Parametric (e.g. Mahalanobis distance)
+
+```{r}
+versicolor <- iris %>%  
+  filter(Species == "versicolor") %>%  
+  dplyr::select(Sepal.Length, Sepal.Width, Petal.Length)
+versicolor |> head()
+```
+
+```{r}
+results <- MVN::mvn(data = versicolor, 
+               multivariateOutlierMethod = "quan", 
+               showOutliers = TRUE)
+results
+```
+
+## 4.2 Apply univariate outlier detection and imputation
+
+```{r}
+# Check if any outliers exist
+iris$Sepal.Width |> 
+  boxplot()
+```
+
+```{r}
+# Calculate the interquartile range
+q1 <- quantile(iris$Sepal.Width, probs = 0.25)
+q3 <- quantile(iris$Sepal.Width, probs = 0.75)
+iqr <- q3 - q1
+lower <- q1 - (1.5 * iqr)
+upper <- q3 + (1.5 * iqr)
+# Identify outliers
+up_outliers <- which(iris$Sepal.Width > upper)
+low_outliers <- which(iris$Sepal.Width < lower)
+# Show the values
+iris$Sepal.Width[c(up_outliers, low_outliers)]
+```
+
+Now we can impute outliers:
+
+```{r}
+# Impute with the mean
+iris$Sepal.Width[c(up_outliers, low_outliers)] <- mean(iris$Sepal.Width)
+boxplot(iris$Sepal.Width)
+```
+
+## 4.3 Delete Outliers
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
