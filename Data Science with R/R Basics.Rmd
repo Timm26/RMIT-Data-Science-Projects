@@ -109,6 +109,25 @@ date2 <- format(as.Date(dates), format = "%Y/%m/%d")
 date2
 ```
 
+If there were more than two different formats in the columns:
+
+```{r}
+date_data4 <- data.frame(obs = 1:4, 
+                         date = c("22 Mar 2005", "15 Feb 2009", 
+                                  "9-Jun-2007", "31 October 2010")) 
+
+date_data4 %<>% 
+  mutate(date = case_when(!is.na(as.Date(date, format = "%d %b %Y")) ~ 
+                            as.Date(date, format = "%d %b %Y"), 
+                          !is.na(as.Date(date, format = "%d %B %Y")) ~ 
+                            as.Date(date, format = "%d %B %Y"), 
+                          !is.na(as.Date(date, format = "%d-%b-%Y")) ~ 
+                            as.Date(date, format = "%d-%b-%Y"))) 
+
+date_data4 
+```
+
+
 
 ## 5.1 Date arithmetic
 
@@ -166,6 +185,8 @@ dyears(1)
 x <- ymd_hms("2000-01-01 12:00:00")
 x + dhours(10) + dminutes(33) + dseconds(54)
 ```
+
+
 
 
 

@@ -280,8 +280,85 @@ starwars$sex_short <- substr(starwars$sex, start = 1, stop=1)
 starwars |> select(sex, sex_short) |> head()
 ```
 
+### 3.2.2 Using strsplit
 
-# 4. Summarise statistics
+```{r}
+# Output will be a list
+streets2 <- "Victoria-Yarra-Russell-Williams-Swanston"
+strsplit(streets2, split = "-")
+unlist(strsplit(streets2, split = "-")) #Unlist the list
+```
+
+## 3.3 Upper/ lower case conversion
+
+```{r}
+a <- "MATH2405 is AWsomE"
+tolower(a)
+toupper(a)
+```
+
+## 3.4 String abbreviations
+
+```{r}
+# Data
+streets <- c("Victoria", "Yarra", "Russell", "Williams", "Swanston")
+# abbreviation
+abbreviate(streets, minlength = 3)
+```
+
+## 3.5 Test equal strings
+
+```{r}
+# Do vectors contain the same values
+set_3 <- c("VIC", "NSW", "TAS")
+set_4 <- c("WA", "SA", "NSW")
+set_5 <- c("NSW", "SA", "WA")
+
+setequal(set_3, set_4)
+setequal(set_4, set_5)
+```
+
+```{r}
+# Are vectors identical
+set_6 <- c("VIC", "NSW", "TAS")
+set_7 <- c("NSW", "VIC", "TAS")
+set_8 <- c("VIC", "NSW", "TAS")
+
+identical(set_6, set_7)
+identical(set_6, set_8)
+```
+
+```{r}
+# Test if a value is in a vector
+set_6 <- c("VIC", "NSW", "TAS")
+set_7 <- c("NSW", "VIC", "TAS")
+set_8 <- c("VIC", "NSW", "TAS")
+# One option
+is.element("VIC", set_8)
+# Preferred 
+"VIC" %in% set_8
+"WA" %in% set_8
+```
+
+```{r}
+# Use it in a filter - filter for id:"us70004m50"
+aus_eq |> 
+  dplyr::filter(id %in% "us70004m50")
+```
+
+## 3.6 Convert a vector to a string and split it
+
+```{r}
+x <- toString(c("Jul", 25, 2017)) # Convert the vector to a string
+x
+str_split(x, ", ") # Split the string on "comma space"
+```
+
+# 4. Manipulate strings using stringr
+
+
+
+# 5. Summarise statistics
 
 More and deeper exposure to dpylr's `summarise()` function in R. It produces summary statistics of an entire dataset and works great in combination with `group_by()`.
 
@@ -331,7 +408,7 @@ terror |>
 ```
 
 
-# 5. Manipulating time and date
+# 6. Manipulating time and date
 
 Main packages: `{stringr}` `{lubridate}`.
 
@@ -341,7 +418,7 @@ library(lubridate)
 ```
 
 
-## 5.1 Get time and date
+## 6.1 Get time and date
 
 Accessing current time and date: `Sys.timezone()`, `Sys.Date`, `Sys.time()`
 
@@ -354,6 +431,11 @@ Sys.Date()
 Sys.time()
 # Get current time using lubridate
 lubridate::now()
+# In one dataframe
+curr_details <- data.frame(Date = Sys.Date(),
+                           Time = Sys.time(),
+                           tz = Sys.timezone())
+curr_details
 ```
 
 {lubridate} can automatically recognise the common separators used when recording dates: `now()`, `ymd()`, `ydm()`, `mdy()`, `dmy()`, `hm()`, `ymd_hms()`
@@ -364,7 +446,7 @@ z <- dmy(z)
 z
 ```
 
-## 5.2 Extract and manipulate date variables
+## 6.2 Extract and manipulate date variables
 
 ```{r}
 # Data
@@ -391,53 +473,15 @@ flights_new$departure |> year() |> head()
 # Extract the month
 flights_new$departure |> month(label = TRUE, abbr = TRUE) |> head()
 # Extract the weekday
-flights_new$departure |> wday() |> head()
+flights_new$departure |> wday(label = TRUE, abbr=FALSE) |> head()
 ```
 
+## 6.3 Calculate time differences in a dataframe
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```{r}
+# Time difference in days
+difftime(as.Date(aus_eq$time[42]), as.Date(aus_eq$time[96]))
+# Time difference in weeks
+difftime(as.Date(aus_eq$time[42]), as.Date(aus_eq$time[96]), units = "weeks")
+```
 
