@@ -356,6 +356,44 @@ str_split(x, ", ") # Split the string on "comma space"
 
 # 4. Manipulate strings using stringr
 
+## 4.1 Basic string manipulation
+
+- String concatenation: `str_c()`, `paste()`, `paste0()`, `glue()`
+- Counting the number of characters in a string: `str_length()`, `nchar()`
+- Subset a string: `str_sub()`
+- Duplicating a string: `str_dup()`
+- Removing whitespace: `str_trim()`
+- Padding a string with leading or trailing characters (incl. whitespace): `str_pad()`
+- Find particular strings: `str_detect()`, `str_starts()`, `str_ends()`
+
+*Workbook `R Basics` dives into the details.*
+
+## 4.2 Advanced string manipulation
+
+- Changing casing: `str_to_lower()`, `str_to_upper()`, `str_to_title()`, `str_to_sentence()`
+- Order strings: `str_order()`, `str_sort()`
+- Locating particular strings: `str_detect()`, `str_starts()`, `str_ends()`
+- Subset a character string: `str_subset()`, `str_extract()`
+- Locate the position of specific characters within a string: `str_locate()`, `str_locate_all()`
+- Count the number of times a character or string appears: `str_count()`
+- Replace a particular character or string: `str_replace()`, `str_replace_all()`, `str_remove()`, `str_remove_all()`
+
+*Workbook `R Basics` dives into the details.*
+
+## 4.3 Extract and replace data
+
+```{r}
+# Change "Kobe Bryant" to "The Black Mamba"
+kobe <- lakers %>% 
+  mutate(player = str_replace_all(player, "Kobe Bryant", "The Black Mamba")) %>% 
+  filter(str_detect(player, "Mamba"))
+nrow(kobe) 
+
+# Get all points
+kobe_shots <- kobe %>% 
+  filter(str_detect(result, "made")) %>% 
+  summarise(total_points = sum(points))
+```
 
 
 # 5. Summarise statistics
@@ -485,3 +523,4 @@ difftime(as.Date(aus_eq$time[42]), as.Date(aus_eq$time[96]))
 difftime(as.Date(aus_eq$time[42]), as.Date(aus_eq$time[96]), units = "weeks")
 ```
 
+# 7. Tokenisation & Stop Words (Coming Soon)
