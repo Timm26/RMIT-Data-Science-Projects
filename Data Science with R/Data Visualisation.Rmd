@@ -1,0 +1,126 @@
+---
+title: "Data Visualisation"
+output: html_document
+---
+```{r, echo=FALSE}
+# Libraries
+library(ggplot2)
+library(dplyr)
+library(here)
+library(readr)
+# Get the data
+Cars <- read_csv(here("ZDatasets","Cars.csv"))
+```
+
+# 1. Layered Grammar of Graphics
+
+Quick note: `qplot()` is deprecated in order to encourage the users to learn `ggplot()` as it makes it *easier to create complex* graphics.
+
+## 1.1 Qplot - Some Basics
+
+Prepare the data - all this does is it relabels the variables from 0,1 to "No", "Yes".
+
+```{r}
+# Prepare the data
+Cars$Sports <- Cars$Sports %>% factor(levels=c(0,1),
+                                      labels=c('No','Yes'), ordered=TRUE)
+Cars$Sport_utility <- Cars$Sport_utility %>% factor(levels=c(0,1),
+                                                    labels=c('No','Yes'), ordered=TRUE)
+Cars$Wagon <- Cars$Wagon %>% factor(levels=c(0,1),
+                                    labels=c('No','Yes'), ordered=TRUE)
+Cars$Minivan <- Cars$Minivan %>% factor(levels=c(0,1),
+                                        labels=c('No','Yes'), ordered=TRUE)
+Cars$Pickup <- Cars$Pickup %>% factor(levels=c(0,1),
+                                      labels=c('No','Yes'), ordered=TRUE)
+Cars$All_wheel_drive <- Cars$All_wheel_drive %>% factor(levels=c(0,1),
+                                                        labels=c('No','Yes'), ordered=TRUE)
+Cars$Rear_wheel_drive <- Cars$Rear_wheel_drive %>% factor(levels=c(0,1),
+                                                          labels=c('No','Yes'), ordered=TRUE)
+Cars$Cylinders <- Cars$Cylinders %>% as.factor()
+```
+
+### 1.1.1 Quick `qplot()` plots
+
+```{r}
+qplot(x = Cylinders, data = Cars, geom ="bar")
+```
+
+### 1.1.2 Make a box plot
+
+```{r}
+qplot(x = Cylinders, y = Kilowatts, data = Cars, geom = "boxplot")
+```
+
+### 1.1.3 Make a scatter plot
+
+```{r}
+qplot(x = Weight, y = Economy_city, data = Cars, geom = "point")
+```
+
+### 1.1.4 Transform variables
+
+```{r}
+qplot(x = log(Weight), y = log(Economy_city), data = Cars, geom = "point")
+```
+
+### 1.1.5 Map other aesthetics
+
+```{r}
+qplot(x = log(Weight), y = log(Economy_city), data = Cars, geom = "point", colour = Cylinders, shape = Cylinders)
+```
+
+### 1.1.6 Trend lines
+
+```{r}
+qplot(x = log(Weight), y = log(Economy_city), data = Cars, geom = "point") +
+  stat_smooth(method = "lm")
+```
+
+### 1.1.7 Facet
+
+```{r}
+# First group categories
+Cars_filter <- Cars |> filter(Cylinders %in% c("4", "6", "8"))
+qplot(x = Kilowatts, y = Retail_price, data = Cars_filter, geom = "point", facets = Cylinders ~ .) +
+  stat_smooth()
+```
+
+- `Cylinders ~ .` –> the left-hand side of the tilde symbol refers to rows and the right-hand side to columns.
+- `.` signifies that no facets will appear on that dimension. In other words, split `Cylinders` across rows.
+- If we wanted to move to columns, we would use `. ~ Cylinders` or just `~Cylinders`.
+
+## 1.2 GGPlot - Main Usage
+
+1. Data - the dataset being visualised
+2. Aesthetics (aes) - mapping data variables to visual properties
+3. Geometries (geom) - the type of plot element - e.g. points, lines, bars
+4. Statistics (stats) - summarise data
+5. Coordinates (coord) - coordinate system, e.g. Catesian, polar
+6. Facets - split data into subplots by variable
+7. Scales - control mapping from data to aesthetics (color, axes, transformations)
+8. Theme - control non-data elements (fonts, background, gridlines)
+
+```{r}
+# Example - ggplot2 already loaded
+ggplot(data = mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +  # data + aesthetics
+  geom_point(size = 3) +                                            # geometry layer
+  geom_smooth(method = "lm") +                                      # statistical layer
+  labs(title = "MPG vs Weight by Cylinder") +                        # labels
+  theme_minimal()                                                    # theme layer
+```
+
+
+?qplot
+
+
+
+
+
+
+
+
+
+
+
+
+
