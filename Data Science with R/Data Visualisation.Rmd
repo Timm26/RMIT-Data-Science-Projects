@@ -2,7 +2,7 @@
 title: "Data Visualisation"
 output: html_document
 ---
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 # Libraries
 library(ggplot2)
 library(dplyr)
@@ -16,6 +16,8 @@ Hair_Eye_Colour <- read_csv(here("ZDatasets","Hair_Eye_Colour.csv"))
 Youtube <- read_csv(here("ZDatasets","Youtube.csv"))
 Body <- read_csv(here("ZDatasets","Body.csv"))
 mpg <- read_csv(here("ZDatasets", "mpg.csv"))
+FEV <- read_csv(here("ZDatasets", "FEV.csv"))
+studentInfo <- read_csv(here("ZDatasets","studentinfo.csv"))
 ```
 
 # 1. Layered Grammar of Graphics
@@ -130,6 +132,15 @@ ggplot(data = Cars_filter, aes(x=Cylinders, y=Economy_city)) +
   ggtitle("Smaller engines have better city fuel economy") +
   stat_summary(fun.y = mean, colour = "red", shape = 17) + # Adds a summary statistic (here mean)
   theme_minimal()
+```
+
+Boxplot with a 95% confidence interval.
+
+```{r}
+g1 <- ggplot(data = FEV, aes(x=smoking, y=FEV))
+g1 + geom_boxplot() + 
+  stat_summary(fun.y = "mean", geom="point", colour="red") +
+  stat_summary(fun.data = "mean_cl_boot", color = 'red', geom="errorbar", width=.2)
 ```
 
 
@@ -350,7 +361,7 @@ p10 + geom_mosaic(aes(x = product(Hair), weight = Freq, fill = Eyes)) +
 ## 9.1 Scatterplot matrix
 
 ```{r}
-library(GGally)
+# library(GGally)
 # Output is massive
 #ggpairs(Body, columns = c(3,6,7,10:19), axisLabels = "internal")
 ```
@@ -383,6 +394,36 @@ p12 + geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 1/2, alpha = .2
   stat_summary(fun.y = "mean", geom = "point", colour = "red")
 ```
 
+# 10. Multivariate data
+
+- Mapping additional aesthetics
+- Faceting
+- Purpose built
+- Animation
+
+## 10.1 Using additional aesthetics
+
+```{r}
+library(gapminder)
+gapminder2007 <- gapminder |> filter(year==2007)
+g2 <- ggplot(gapminder2007, aes(x=gdpPercap,y=lifeExp))
+g2 + geom_point(aes(size = pop, colour = continent)) +
+  labs(x="GDP Per Capita", y="Life Expectancy", title="Country GDP per capita predicts life expectancy (2007)") +
+  scale_size(name = "Pop Size") +
+  scale_color_discrete(name = "Continent")
+```
+
+## 10.2 Faceting
+
+`facet_grid(. ~ var)` will align facets as columns and `facet_grid(var ~ .)` as rows.
+
+```{r}
+ggplot(studentInfo, aes(x=highest_education, y=avg_grade, fill=gender)) +
+  geom_boxplot() +
+  labs(y="Average Grade", x="Highest Education") +
+  theme(legend.title=element_blank()) + coord_flip() +
+  facet_wrap(~ region)
+```
 
 
 
