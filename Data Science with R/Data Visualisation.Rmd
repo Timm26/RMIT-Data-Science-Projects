@@ -425,17 +425,3 @@ ggplot(studentInfo, aes(x=highest_education, y=avg_grade, fill=gender)) +
   facet_wrap(~ region)
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
