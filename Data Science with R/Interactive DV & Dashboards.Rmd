@@ -2,8 +2,18 @@
 title: "Interactive DV & Dashboards"
 output: html_document
 ---
+```{r, message=FALSE}
+library(dplyr)
+library(here)
+library(plotly)
+library(lubridate)
+# Get data
+Body <- read_csv(here("ZDatasets","Body.csv"))
+FEV <- read_csv(here("ZDatasets","FEV.csv"))
+```
 
-# 1. Interactive Data Visualisation
+
+# 1. Interactive Data Visualisation with Plotly
 
 Seven categories of interaction:
 - Select
@@ -14,8 +24,229 @@ Seven categories of interaction:
 - Filter
 - Connect
 
-## 1.1 Plotly - Adding Interactive Features
+## 1.1 Plotly Scatterplot - Adding Interactive Features
 
+```{r}
+# Clean the data and remove outliers
+Body_clean <- Body |> filter(Weight < 300)
+```
 
+Let's start with Plotly using plot_ly().
+- add_trace() will add a layer showing the linear regression trend line
+- layout() defines some layout options
 
+```{r}
+# Define the figure
+p1 <- plot_ly(data = Body_clean, x=~Abdomen, y=~BFP_Siri, type = "scatter",
+  mode = "markers", name = "Data") |> 
+    layout(
+      yaxis = list(zeroline = FALSE, title = "Body Fat % (Siri Method)"),
+      xaxis = list(zeroline = FALSE, title = "Abdomen Circumference (in)")) |> 
+    add_trace(mode = "lines", x = ~Abdomen,
+              y = fitted(lm(Body_clean$BFP_Siri ~ Body_clean$Abdomen)),
+              name = "Linear Trend")
+# Show the plot
+p1
+```
+
+Another interactive plot with 4 variables:
+
+```{r}
+p2 <- plot_ly(data = Body_clean, x = ~Abdomen, y = ~BFP_Siri,
+              size = ~Age, color = ~Weight, type = "scatter", mode = "markers",
+              colors = "RdYlBu", hoverinfo = "text",
+              text = paste("<b>Abdomen</b> = ", Body_clean$Abdomen,
+                           "<br><b>BFP</b> = ", Body_clean$BFP_Siri,
+                           "<br><b>Age</b> = ", Body_clean$Age,
+                           "<br><b>Weight</b> = ", Body_clean$Weight)) %>%
+  layout(
+    title ="Body Fat Percentage by Abdomen, Weight and Age (point size)",
+    yaxis = list(zeroline = FALSE, title = "Body Fat % (Siri Method)"),
+    xaxis = list(zeroline = FALSE, title = "Abdomen Circumference (in)"))
+# Display the plot
+p2
+```
+
+## 1.2 Plotly - Bar charts
+
+```{r}
+# Summarise the data first
+FEV
+FEV_sum <- table(FEV$smoking,
+                 FEV$sex,
+                 dnn = c("smoking", "sex")) |> data.frame()
+FEV_sum
+```
+
+Plotly Bar chart:
+
+```{r}
+p3 <- plot_ly(data = FEV_sum, x=~smoking, y=~Freq, type="bar", color=~sex,
+              colors = c("#67a9cf","#ef8a62")) %>%
+  layout(
+    yaxis = list(zeroline = FALSE, title="Count"),
+    xaxis = list(zeroline = FALSE, title="Smoking Status"))
+# Display the plot
+p3
+```
+
+## 1.3 Other plots
+
+Plotly support a full range of plot types. All can be found online.
+- Bubble, scatter, line charts
+- Area, Pie charts
+- Dot, Histogram, Box plots
+- 2D plots
+- Statistical plots
+
+## 1.4 The ggplotly wrapper
+
+The ggplotly wrapper will convert ggplot2 objects to plotly objects.
+
+### Step 1: Create a ggplot object
+
+```{r}
+# Create a ggplot object
+p4 <- ggplot(data = FEV, aes(x=height, y=FEV, colour=smoking)) +
+  geom_point() + geom_smooth() + facet_grid(. ~ sex)
+# Display the plot
+p4
+```
+
+### Step 2: Add the ggplot wrapper
+
+```{r}
+gg1 <- ggplotly(p4, widht=700, height=500)
+gg1
+```
+
+## 1.5 Sharing work on Plotly
+
+Assign to the R environment
+
+```{r}
+# username <- "jbaglin"
+# apikey <- "4lddfzc69lx" # Replace this with the API
+# Saving the credentials
+# Sys.setenv("plotly_username"= username)
+# Sys.setenv("plotly_api_key"= apikey)
+# Host the p3 on Plotly
+# api_create(p3, filename = "body-fat-percent", sharing = "public")
+```
+
+## 1.6 One last Plotly project
+### 1.6.1 Add a time series plot
+
+```{r}
+# Get the data
+texas <- ggplot2::txhousing
+# Prepare the data
+texas_sum <- txhousing %>% group_by(year,month) %>%
+  summarise(sales = sum(sales,na.rm = TRUE),
+            volume = sum(volume,na.rm = TRUE),
+            median = sum(median,na.rm = TRUE),
+            listings = sum(listings,na.rm = TRUE),
+            inventory = sum(inventory,na.rm = TRUE))
+# Ungroup for further manipulation
+texas_sum <- texas_sum %>% ungroup()
+# Amend the date column
+texas_sum$date <- ymd(paste0(texas_sum$year,"-",texas_sum$month,"-1"))
+# Plot the data
+p5 <- plot_ly(data = texas_sum) |> 
+  add_trace(x = ~date, y = ~sales, mode = 'lines') |> 
+  layout(
+    yaxis = list(zerolines=FALSE),
+    xaxis = list(zerolines=FALSE),
+    title = "<br>Monthly Texas Housing Sales</br>")
+p5
+```
+
+### 1.6.2 Add a range selector
+
+```{r}
+p6 <- plot_ly(data = texas_sum) |> 
+  add_trace(x = ~date, y = ~sales, mode = "lines") |> 
+  layout(
+    yaxis = list(zerolines = FALSE),
+    xaxis = list(zerolines = FALSE, rangeslider = list(type="date")),
+    title = "Monthly Texas Housing Sales")
+p6
+```
+
+## 1.6.3 Add custom buttons
+
+```{r}
+p7 <- plot_ly(data=texas_sum) |> 
+  add_trace(x = ~date, y = ~sales, mode = "lines") |> 
+  layout(
+    yaxis = list(zerolines = FALSE),
+    xaxis = list(zerolines = FALSE,
+                 rangeslider = list(type = "date"),
+                 rangeselector = list(
+                   buttons = list(
+                     list(
+                       count = 6,
+                       label = "Half year",
+                       step = "month",
+                       stepmode = "backward"),
+                     list(
+                       count = 1,
+                       label = "Year",
+                       step = "year",
+                       stepmode = "backward"),
+                     list(step = "all")))),
+    title = "Monthly Texas Housing Sales")
+p7
+```
+
+## 1.6.4 Adding different indicators
+
+```{r}
+# update indicator variable menu
+updatemenus <- list(
+  list(
+    active = 0,
+    x = -.125,
+    type= 'buttons',
+    buttons = list(
+      list(
+        label = "Sales",
+        method = "update",
+        args = list(list(visible = c(TRUE, "legendonly", "legendonly",
+                                     "legendonly", "legendonly" )))),
+      list(
+        label = "Volume",
+        method = "update",
+        args = list(list(visible = c("legendonly", TRUE, "legendonly",
+                                     "legendonly", "legendonly")))),
+      list(
+        label = "Median",
+        method = "update",
+        args = list(list(visible = c("legendonly", "legendonly", TRUE,
+                                     "legendonly", "legendonly")))),
+      list(
+        label = "Listings",
+        method = "update",
+        args = list(list(visible = c("legendonly", "legendonly", "legendonly",
+                                     TRUE, "legendonly")))),
+      list(
+        label = "Inventory",
+        method = "update",
+        args = list(list(visible = c("legendonly", "legendonly", "legendonly",
+                                     "legendonly", TRUE)))))))
+
+p8 <- plot_ly(data = texas_sum) %>%
+  add_lines(x=~date, y=~sales, name = "Sales", visible = "TRUE") %>%
+  add_lines(x=~date, y=~volume, name = "Volume", visible = "legendonly") %>%
+  add_lines(x=~date, y=~median, name = "Median", visible = "legendonly") %>%
+  add_lines(x=~date, y=~listings, name = "Listings", visible = "legendonly") %>%
+  add_lines(x=~date, y=~inventory, name = "Inventory", visible = "legendonly") %>%
+  layout(
+    title = "Texas Housing Market Time Series", showlegend=TRUE,
+    xaxis=list(zeroline = FALSE,title="Date"),
+    yaxis=list(zeroline = FALSE,title="Value"),
+    updatemenus=updatemenus)
+# Plot the data
+p8
+```
 
