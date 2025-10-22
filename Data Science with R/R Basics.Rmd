@@ -3,6 +3,12 @@ title: "R Basics"
 output: html_document
 ---
 
+```{r}
+library(ggplot2)
+library(dplyr)
+```
+
+
 # 1. Vectors
 
 ```{r}
@@ -342,4 +348,35 @@ str_detect(emails, "[:digit:]")
 # Subset emails that contains numbers
 str_subset(emails, "[:digit:]")
 ``` 
+
+# 7. Deeper dive into factor variables
+
+```{r, message=FALSE}
+# Get data
+Bicycle <- read_csv(here("ZDatasets","Bicycle.csv"))
+Bicycle$day <- Bicycle$day |> as.factor()
+```
+
+Check the levels
+```{r}
+Bicycle$day |> levels()
+```
+
+Order the factor:
+```{r}
+Bicycle$day <- Bicycle$day |> factor(
+  levels = c('Sun','Mon','Tue','Wed','Thu','Fri','Sat'),
+  labels = c('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),
+  ordered=TRUE)
+# Display the result
+Bicycle$day |> head()
+```
+
+Use the `forcats` package:
+```{r}
+library(forcats)
+Bicycle$weekend <- Bicycle$weekend %>% as.factor
+Bicycle$weekend <-Bicycle$weekend %>% fct_recode("Weekend" = "TRUE","Weekday"  = "FALSE")
+Bicycle$weekend |> head()
+```
 

@@ -1,0 +1,114 @@
+---
+title: "Basic Statistics"
+output: html_document
+---
+
+# 1. Basic Statistics
+
+## 1.1 Central tendency
+
+### 1.1.1 Mean
+
+```{r}
+# Some data
+heights <- c(166, 177, 164, 167, 177)
+# Average value of the vector
+mean(heights) 
+```
+
+### 1.1.2 Median
+
+```{r}
+# Middle value of the vector
+median(heights)
+```
+
+## 1.2 Spread of the data
+
+### 1.2.1 Range
+
+```{r}
+# Minimum value
+min(heights)
+# Maximum value
+max(heights)
+# Second last
+heights[length(heights) -1]
+# Third last
+heights[length(heights) -2]
+```
+
+### 1.2.2 Variance
+
+Population variance:
+
+$$\sigma^2 = \frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2$$
+
+Sample variance:
+
+$$s^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2$$
+
+```{r}
+var(heights)
+```
+
+### 1.2.3 Standard deviation
+
+Population standard deviation:
+
+$$\sigma = \sqrt{\sigma^2} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2}$$
+
+Ssample standard deviation:
+
+$$s = \sqrt{s^2} = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2}$$
+
+```{r}
+sd(heights)
+# Alternative: sqrt(var(heights))
+```
+
+### 1.2.4 Quantile
+
+```{r}
+quantile(heights, 0.25)
+```
+
+
+# 2. Visualisations for Descriptive Statistics
+## 2.1 Visualisations of qualitative variables
+- Bar chart
+- Clustered bar chart
+
+## 2.2 Visualisations of quantitative variables
+- Histogram
+- Scatterplot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
