@@ -3,6 +3,11 @@ title: "Basic Statistics"
 output: html_document
 ---
 
+```{r}
+library(tidyverse)
+```
+
+
 # 1. Basic Statistics
 
 ## 1.1 Central tendency
@@ -84,20 +89,375 @@ quantile(heights, 0.25)
 - Scatterplot
 
 
+# 3. Probability
+
+## 3.1 Principles
+
+- Principle 1: The probability of any event A, $P(A) \geq 0$
+- Principle 2: $P(S) = 1$ # Sample Space
+- Principle 3: For any *disjoint* events, A and B, $P(A \text{ or } B \text{ or } C) = P(A) + P(B) + P(C)$ 
+- Principle 4: $P(\text{not } A) = 1 - P(A)$
+- Principle 5: $P(A \text{ or } B) = P(A) + P(B) - P(A \text{ and } B)$
+- Principle 6: Events A and B are said to be independent when $P(A \text{ and }B) = P(A) x P(B)$
+
+## 3.2 Expected values of numerical values 
+- Only applies to discrete probability distributions - where the variable X can take on a discrete number with associated probabilities.
+
+Expected value:
+
+$$E(X) = x_1p_1 + x_2p_2 + x_3p_3 + ... + x_np_n$$
+
+Variance:
+$$Var(X) = (x_1 - \mu)^2p_1 + (x_2 - \mu)^2p_2 + (x_3 - \mu)^2p_3 + ... + (x_n - \mu)^2p_n$$
+
+Standard deviation:
+$$\sigma = \sqrt{Var(X)}$$
+
+Example:
+```{r}
+# Create the dataframe
+die_1 <- die_2 <- c(1,2,3,4,5,6)
+df <- data.frame('die_1' = rep(die_1,6), 'die_2' = rep(die_2, each=6))
+df$sum_of_dice <- df$die_1 + df$die_2
+freq_tbl <- plyr::count(df, vars = "sum_of_dice")
+freq_tbl$prop <- freq_tbl$freq / sum(freq_tbl$freq)
+freq_tbl |> head()
+```
+
+```{r}
+# Calculate expected value i.e. weighted mean
+mu <- sum(freq_tbl$sum_of_dice * freq_tbl$prop)
+mu
+```
+
+Only applies to discrete variables: 
+$$\text{Var}(X) = E(X^2) - [E(X)]^2$$
+```{r}
+# Variance
+sigma_sq <- sum(freq_tbl$sum_of_dice * freq_tbl$sum_of_dice * freq_tbl$prop) - mu^2
+sigma_sq
+```
+
+```{r}
+# Standard deviation
+sqrt(sigma_sq)
+```
+
+# 3. Uniform distribution
+
+```{r}
+# Data
+min <- 0
+max <- 10
+x <- 5
+```
 
 
+## 3.1 Continuous uniform variable
+Mean:
+$$\mu = \frac{a+b}{2}$$
+Variance:
+$$\sigma^2 = \frac{(b-2)^2}{12}$$
+
+### 3.1.1 `dunif()`
+
+Density - gives the height of the probability density function (PDF)
+"How likely is this exact value?"
+
+```{r}
+# Density at x = 5
+dunif(x, min, max)
+```
+
+### 3.1.2 `punif()`
+
+Cumulative probability - gives $P(X \leq x)$.
+"What's the probability of being less than or equal to x?"
+
+```{r}
+# Cumulative probability up to x = 3
+punif(3, min,max)
+# P(X > x)
+1 - punif(3, min, max)
+```
+
+### 3.1.3 `runif()`
+
+Generate random uniform data.
+
+```{r}
+# 5 random numbers between 0 and 10
+runif(5, min, max)
+```
+
+## 3.2 Discrete uniform variable
+Mean:
+$$\mu = \frac{N+1}{2}$$
+Variance:
+$$\sigma^2 = \frac{N^2-1}{12}$$
+
+# 4. Binomial distribution
+
+```{r}
+# Data
+n <- 10
+p <- 0.3
+x <- 4
+```
 
 
+Used to model the number of binomial outcomes.
+Builds upon the `Bernoulli distribution`, which describes the probability of 1 sample where $0 \leq p \leq 1$.
+
+$$P(X = x) = (\frac{n}{x})p^x(1-p)^{n-x}$$
+- $X$ is the random number of successes
+- $n$ is the number of independent trials
+- $p$ is the fixed probability of success for each trial
+- $x$ is the number of successes, which can take the values of 0,1,...,n
+
+## 4.1 `dbinom()`
+
+Probability of exactly 4 successes:
+
+```{r}
+dbinom(x, size=n, prob=p)
+```
+
+## 4.2 `pbinom()`
+
+Cumulative probability of <= 4 successes.
+
+```{r}
+pbinom(x, size=n, prob=p)
+```
+
+Cumulative probability of > 4 successes.
+
+```{r}
+pbinom(x, size=n, prob=p, lower.tail = FALSE)
+```
+
+## 4.3 `qbinom()`
+
+Quantile (inverse CDF) - gives smallest $x$ where $P(X \leq x)p$.
+"What number of successes corresponds to this probability?"
+
+```{r}
+qbinom(0.5, size=n, prob=p) # 50% of the distribution lies at or below 3 successes
+```
+
+## 4.4 `rbinom()`
+
+Random generation - simulates binomial outcomes.
+"Generate random counts of successes"
+
+```{r}
+rbinom(5, size=n, prob=p) # 5 simulated experiments of 10 trials each
+```
+
+# 5. Normal distribution
+
+```{r}
+# Data
+mean <- 8
+sd <- 2
+```
 
 
+Examples: People's heights, weights, blood pressures, employee abilities and performances.
+
+## 5.1 Z-score
+
+Convert X to its Z-score -> How many SDs from the mean.
+$$Z = \frac{X-\sigma}{\mu}$$
+Convert a Z-score back to its original X value:
+$$X = \mu + \sigma Z$$
+```{r}
+ggplot(data = data.frame(x=c(-4,4)), aes(x)) +
+  stat_function(fun = dnorm, geom = "area", fill = "steelblue", n=101,
+                args = list(mean =0, sd =1))+
+  xlab("") + ylab("")
+```
+
+## 5.1 `pnorm()`
+
+A company that produces battery operated vacuum cleaners estimates that demand for its leading model in the following year will be normally distributed with mean = 8 million units and sd = 2 million units. Run the code below to answer the following: 
+
+The probability that demand will fall below 5 million units. 
+
+```{r}
+# (a) P(X ≤ 5) 
+x_a <- 5 
+ans.a <- pnorm(x_a, mean, sd, lower.tail = TRUE) 
+```
+
+## 5.2 `qnorm()`
+
+The probability that demand will exceed 12 million units. 
+
+```{r}
+# (b) P(X > 12) 
+x_b <- 12 
+ans.b <- pnorm(x_b, mean, sd, lower.tail = FALSE) 
+```
+
+## 5.3 `rnorm()`
+
+The 95th percentile of the demand for the leading model. 
+
+```{r}
+# (c) Find x such that  P(X ≤ x) = 0.95 
+proportion <- 0.95  
+ans.c <- qnorm(proportion, mean, sd, lower.tail = TRUE) 
+```
 
 
+# 6. Poisson and exponential distributions
+## 6.1 Poisson distribution
+
+Models the number of events occurring in a fixed time or space interval, when tose events happen:
+- independently
+- at a constant average rate $\lambda$
+Example: Number of emails recevied per hour.
+
+$$P(X = k) = \frac{e^{-\lambda} \lambda^k}{k!}$$
+
+```{r}
+library(LearningStats) 
+# Poisson distribution illustrated for mean = 0.5 
+mean <- 0.5 
+plotPois(mean, type = "p", col = "grey") 
+```
+
+### 6.1.1 `dpois()`
+
+Probability of exactly k events
+PMF: $P(X = k)$
+
+```{r}
+# Variables
+lambda <- 3 # mean number of events per interval
+k <- 2 # observed number of events
+# Probability of exactly 2 events
+dpois(k, lambda)
+```
+
+### 6.1.2 `ppois()`
+
+1. Probability of k or fewer events.
+2. Probability of more than k events.
+
+```{r}
+# 1. Probability of 2 or fewer events
+ppois(k, lambda)
+# 2. Probability of 3 or more events
+ppois(k, lambda, lower.tail = FALSE)
+```
+
+### 6.1.3 `qpois()`
+
+Quantile - smallest k with $P(X \leq k)p$
+
+```{r}
+# Quantile for 70% probability
+qpois(0.7, lambda)
+```
+
+### 6.1.4 Generate random counts
+
+```{r}
+rpois(5, lambda)
+```
 
 
+## 6.2 Exponential distribution
 
+The exponential distribution models the time between consecutive Poisson events. It's a continuous distribution with rate parameter $\lambda$.
+- Example: Time between incoming emails.
 
+```{r}
+#Comparison of exponentials with lambda = 0.5, 2.5  
+plot <- ggplot(data = data.frame(x = c(0, 5)), aes(x)) + 
+  stat_function(fun = dexp,  
+                geom = "area",  
+                fill = "darkgrey",  
+                n = 101,  
+                args = list(rate = 0.5)) +  
+  stat_function(fun = dexp,  
+                geom = "area",  
+                fill = "steelblue", 
+                alpha= 0.6, 
+                n = 101,  
+                args = list(rate = 2.5)) +  
+  xlab("") + ylab("") 
+plot 
+```
 
+### 6.2.1 `dexp()`
 
+PDF - density at x
+"Likelihood of this exact wait time".
+
+```{r}
+lambda <- 0.5   # events per time unit
+x <- 2          # waiting time
+
+# Probability that waiting time ≤ 2
+pexp(x, rate = lambda)
+```
+
+### 6.2.2 `qexp()`
+
+CDF - $P(X \leq x$
+"Probability that waiting time <= x"
+
+```{r}
+# Find the time by which 80% of events occur
+qexp(0.8, rate = lambda)
+```
+
+### 6.2.3 `rexp()`
+
+```{r}
+# Generate random waiting times
+rexp(5, rate = lambda)
+```
+
+# 7. Covariance and Correlation
+## 7.1 Covariance
+
+For two random variables X and Y:
+$$\text{Cov}(X, Y) = E(XY) - E(X)E(Y)$$
+Measures:
+- How two variables vary together
+- If both increase together -> positive covariance
+- If one increases while the other decreases -> negative covariance
+- If they are unrelated -> covariance ≈ 0
+
+## 7.2 Pearson Correlation
+
+$$\rho = \frac{Cov(X,Y)}{\sigma(X)*\sigma(Y)}$$
+- $\sigma_x$ = standard deviation of X
+- $\sigma_y$ = standard deviation of Y
+
+# 8. Vicariate Normal Distribution
+
+Describes a pair of continuous random variables X and Y that jointly follow a normal distribution with parameters:
+$$(\mu_X, \mu_Y, \sigma_X, \sigma_Y, \rho)$$
+
+The join density function (PDF) is:
+$$f(x, y) = \frac{1}{2\pi \sigma_X \sigma_Y \sqrt{1 - \rho^2}}
+\exp\left[
+-\frac{1}{2(1 - \rho^2)}
+\left(
+\frac{(x - \mu_X)^2}{\sigma_X^2}
+	•	\frac{2\rho(x - \mu_X)(y - \mu_Y)}{\sigma_X \sigma_Y}
+
+	•	\frac{(y - \mu_Y)^2}{\sigma_Y^2}
+\right)
+\right]$$
+
+## 8.1 Example
 
 
 
