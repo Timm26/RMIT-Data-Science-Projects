@@ -1,0 +1,67 @@
+---
+title: "Sampling"
+output: html_document
+---
+
+# 1. Sampling in R
+
+- Sampling distribution: Distribution of all the possible values of a sample statistics for a given sample size selected from a population
+
+## 1.1 Sampling distribution of the means
+- Distribution of means $\hat{x}$ created by taking many repeated random samples of size n. 
+- The mean of the sampling distribution is the population mean  $\mu_{\hat{x}}$. 
+- The standard deviation of this distribution of the sample means is known as the standard error (SE) or the SE of the mean.
+
+$$SE_{\text{of the mean}} = \sigma_{\hat{x}} = \frac{\sigma}{\sqrt{n}}$$
+-> SE decreases as the sample size increases.
+
+
+# 2. Central Limit Theorem
+
+CLT implies that a population mean can be estimated by obtaining a large enough representative sample from the larger population. 
+
+- When sampling from a population with mean $\mu$ and standard deviation $\sigma$, the sampling distribution of the sample mean will tend to a normal distribution with mean $\mu$ and standard deviation $\sigma / \sqrt{n}$ as the sample size becomes large ($n > 30$).
+
+
+# 3. Sample size
+
+Calculation:
+
+$$n = (\frac{Z_{\alpha/2}\sigma}{E})^2$$
+Where:
+- $E$ = Margin of error that we are willing to accept
+- $1 - \alpha$ = the probability that the magnitude of that error will not exceed
+
+```{r}
+# Create the function to determine the sample size
+samp_size <- function(z, E, sigma){
+  out <- ((z * sigma) / E)^2
+  out
+}
+```
+
+```{r}
+# Create our variables
+alpha <- 0.05 # for a 95% CI, alpha is 5%
+sigma <- 0.03 # the standard deviation of the chain of shops
+E <- 0.01 # The expected effect size (MoE)
+z <- qnorm(alpha/2, lower.tail = FALSE)
+
+# Example
+n <- samp_size(z = z, E = E, sigma = sigma)
+print(ceiling(n)) # round up to the next integer
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

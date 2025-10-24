@@ -1,0 +1,382 @@
+---
+title: "R Basics"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+library(dplyr)
+```
+
+
+# 1. Vectors
+
+```{r}
+ex1 <- c("a", "b", "c", 1, 2, 3)
+class(ex1) # coerces numbers to strings
+ex1[4] # Take the first index
+```
+
+# 2. Lists
+
+```{r}
+# Create a list
+list1 <- list(1:3, "a", c(TRUE, FALSE, TRUE), c(2.5, 4.2))
+class(list1)
+str(list1)
+```
+
+```{r}
+# Add elements to an existing list
+list2 <- append(list1, c("credit1", "debit", "Paypal"))
+# Name a list
+names(list2) <- c("item1", "item2", "item3", "item4", "item5", "item6", "item7")
+list2
+# Call by name
+list2$item3
+```
+
+# 3. Matrix
+
+```{r}
+# Create a matrix
+m1 <- matrix(1:6, nrow = 2, ncol = 3)
+v1 <- c(1,4,5)
+v2 <- c(6,8,10)
+m2 <- cbind(v1,v2) # Column bind two vectors
+m3 <- rbind(v1,v2) # Row bind two vectors
+# Name the vector
+rownames(m1) <- c("subject1", "subject2")
+colnames(m1) <- c("col1", "col2", "col3")
+# Display results
+m1
+m2 # Columns already named
+m3 # Rows already named
+```
+
+```{r}
+# Show the attributes
+attributes(m1)
+```
+
+```{r}
+# Subset the value in the first row and second column
+m1[1,2]
+# Subset for rows 1 and 2 but keep al rows
+m1[1:2,]
+```
+
+```{r}
+# Use row names to subset
+m1['subject1',]
+```
+
+# 4. DataFrame
+
+```{r}
+# Create a dataframe
+df1 <- data.frame(col1 = 1:3,
+                  col2 = c("credit", "debit", "paypal"),
+                  col3 = c(TRUE, FALSE, TRUE),
+                  col4 = c(25.5, 44.2, 54.9))
+# Inspect it's structure
+str(df1)
+```
+
+```{r}
+# Create a new vector
+v4 <- c("VIC", "NSW", "TAS")
+df2 <- cbind(df1, v4)
+rownames(df2) <- c("subj1", "subj2", "subj3")
+colnames(df2) <- c("number", "card_type", "fraud", "transaction")
+str(df2)
+#View(df2)
+```
+
+```{r}
+# Subset by row numbers
+df2[2:3,]
+# Subset by column numbers
+df2[2, c(1,4)]
+# Same as above but uses row and column names
+df2[c("subj2", "subj3"), c("number", "transaction")]
+```
+
+# 5. Date and Timezones
+
+Basic date creation:
+
+```{r}
+# Create a date
+dates <- c("2020-01-01", "2019-06-30", "2012-04-27", "2008-08-08", "2010-11-19")
+date1 <- as.Date(dates)
+date1
+date2 <- format(as.Date(dates), format = "%Y/%m/%d")
+date2
+```
+
+If there were more than two different formats in the columns:
+
+```{r}
+date_data4 <- data.frame(obs = 1:4, 
+                         date = c("22 Mar 2005", "15 Feb 2009", 
+                                  "9-Jun-2007", "31 October 2010")) 
+
+date_data4 %<>% 
+  mutate(date = case_when(!is.na(as.Date(date, format = "%d %b %Y")) ~ 
+                            as.Date(date, format = "%d %b %Y"), 
+                          !is.na(as.Date(date, format = "%d %B %Y")) ~ 
+                            as.Date(date, format = "%d %B %Y"), 
+                          !is.na(as.Date(date, format = "%d-%b-%Y")) ~ 
+                            as.Date(date, format = "%d-%b-%Y"))) 
+
+date_data4 
+```
+
+
+
+## 5.1 Date arithmetic
+
+### 5.1.1 Create year, minutes, hours, etc
+
+Create years:
+
+```{r}
+# Get the current year
+curr_year <- Sys.Date() |> 
+  year() |> 
+  as.integer()
+# Create even years
+even_year <- seq(from = 1980, to = curr_year, by = 2)
+even_year
+```
+
+Create hours:
+
+```{r}
+# Create hours
+hour_list <- seq(ymd_hm("2000-1-1 9:00"), ymd_hm("2000-1-1 12:00"), by="hour")
+hour_list
+```
+
+Create months:
+
+```{r}
+month_list <- seq(ymd_hm("2000-1-1 9:00"), ymd_hm("2000-12-1 9:00"), by="month")
+month_list |> head()
+```
+
+## 5.2 Calculate time intervals
+
+```{r}
+# Calculate the days since first of Jan 2000
+days_spent <- today() - ymd(20000101)
+days_spent
+# Calculate the week since first of Jan 2000
+difftime(today(), ymd(20000101), units = "weeks")
+```
+
+## 5.3 duration()
+
+```{r}
+# Create a new duration represented in seconds
+duration(1)
+# Create durations for minutes
+dminutes(1)
+# Create durations in hours
+dhours(1)
+# Create durations in years
+dyears(1)
+# Add/subtract durations from date/time object
+x <- ymd_hms("2000-01-01 12:00:00")
+x + dhours(10) + dminutes(33) + dseconds(54)
+```
+
+# 6. Manipulate strings using stringr
+
+## 6.1 Basic string manipulation
+
+- String concatenation: `str_c()`, `paste()`, `paste0()`, `glue()`
+- Counting the number of characters in a string: `str_length()`, `nchar()`
+- Subset a string: `str_sub()`
+- Duplicating a string: `str_dup()`
+- Removing whitespace: `str_trim()`
+- Padding a string with leading or trailing characters (incl. whitespace): `str_pad()`
+- Find particular strings: `str_detect()`, `str_starts()`, `str_ends()`
+
+```{r}
+# String concatenation
+text1 = str_c("RMIT","is","a","good","university.", sep = " ")
+text1
+# Count the caharacters
+nchar(text)
+# Alternatively: str_length(text)
+```
+
+```{r}
+# Duplicate characters within a string
+str_dup("funny", times = 4)
+```
+
+```{r}
+# Removing whitespace
+text2 <- c("Text ", "  with", " whitespace ", " on", "both ", " sides ")
+text2
+str_trim(text2, side = "both")
+```
+
+```{r}
+# Pad a string
+str_pad("apples", width = 10, side = "both", pad = "!")
+```
+
+```{r}
+# Glue
+var1 <- "Learning" 
+var2 <- "to"
+var3 <- "use"
+var4 <- "the"
+var5 <- "glue"
+var6 <- "package"
+
+glue::glue("{var1} {var2} {var3} {var4} {var5} {var6}")
+# More useful in combination
+glue::glue("{var1} to use the {var5} package")
+# Using base R instead
+paste0(var1, ", to use, the ", var5, ", ", var6)
+```
+
+## 6.2 Advanced string manipulation
+
+- Changing casing: `str_to_lower()`, `str_to_upper()`, `str_to_title()`, `str_to_sentence()`
+- Order strings: `str_order()`, `str_sort()`
+- Locating particular strings: `str_detect()`, `str_starts()`, `str_ends()`
+- Subset a character string: `str_subset()`, `str_extract()`
+- Locate the position of specific characters within a string: `str_locate()`, `str_locate_all()`
+- Count the number of times a character or string appears: `str_count()`
+- Replace a particular character or string: `str_replace()`, `str_replace_all()`, `str_remove()`, `str_remove_all()`
+
+```{r}
+# Some text
+x <- "I like VeGGies."
+# convert all upper case characters to lower case
+str_to_lower(x)
+#convert all lower case characters to upper case
+str_to_upper(x)
+# convert only first letters of words to upper case
+str_to_title(x)
+# convert only first letter of the sentence 
+str_to_sentence(x)
+```
+
+```{r}
+# some text
+x <- c("y", "i", "k")
+# return the index of ordered values
+str_order(x)
+# sort characters
+str_sort(x)
+```
+
+```{r}
+# Pattern matching (Pattern detect, subset, locate, count, extract, and replace)
+x <- c("apple", "banana", "pear")
+# Same as above using regex
+str_detect(x, regex("ea"))
+
+# Perform a case-insensitive match using `ignore.cases = TRUE`
+bananas <- c("banana", "Banana", "BANANA")
+#case sensitive match
+str_detect(bananas, "banana") 
+#case insensitive match
+str_detect(bananas, regex("banana", ignore_case = TRUE))
+```
+
+```{r}
+# locate all the full stops (\\.) in this string
+str_locate_all("Full stop separates two sentences. Now I will locate all full stops.", "\\.")
+```
+
+```{r}
+# Use `str_count()` to count the number of matches for a given string
+# Counts the digits
+str_count("90 Dollars", "[:digit:]") 
+
+# Counts the letters
+str_count("90 Dollars", "[:alpha:]")
+```
+
+```{r}
+# replace Dollars with AUD
+str_replace("90 Dollars", pattern = "Dollars", replacement = "AUD")
+```
+
+
+## 6.3 Using Regular Expression
+
+With regex, you can create your own character classes using `[ ]`. For example:
+
+`[abc]` : matches a, b, or c.
+`[a-z]` : matches every character between a and z (in Unicode code point order).
+`[^abc]` : matches anything except a, b, or c.
+`[\^\-]` : matches ^ or -.
+
+There are a number of pre-built classes that you can use inside `[ ]`:
+`[:punct:]` : punctuation.
+`[:alpha:]` : letters.
+`[:lower:]` : lowercase letters.
+`[:upper:]` : upperclass letters.
+`[:digit:]` : digits.
+`[:xdigit:]` : hex digits.
+`[:alnum:]` : letters and numbers.
+`[:cntrl:]` : control characters.
+`[:graph:]` : letters, numbers, and punctuation.
+`[:print:]` : letters, numbers, punctuation, and whitespace.
+`[:space:]` : space characters (basically equivalent to ).
+`[:blank:]` : space and tab.
+
+Here are some examples:
+
+``` {r emails}
+emails <- c("s123456@student.rmit.edu.au", 
+            "staff.name@rmit.edu.au", 
+            "s654321@rmit.edu.vn") 
+
+# detect the emails containing numbers: 
+str_detect(emails, "[:digit:]")
+
+# Subset emails that contains numbers
+str_subset(emails, "[:digit:]")
+``` 
+
+# 7. Deeper dive into factor variables
+
+```{r, message=FALSE}
+# Get data
+Bicycle <- read_csv(here("ZDatasets","Bicycle.csv"))
+Bicycle$day <- Bicycle$day |> as.factor()
+```
+
+Check the levels
+```{r}
+Bicycle$day |> levels()
+```
+
+Order the factor:
+```{r}
+Bicycle$day <- Bicycle$day |> factor(
+  levels = c('Sun','Mon','Tue','Wed','Thu','Fri','Sat'),
+  labels = c('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),
+  ordered=TRUE)
+# Display the result
+Bicycle$day |> head()
+```
+
+Use the `forcats` package:
+```{r}
+library(forcats)
+Bicycle$weekend <- Bicycle$weekend %>% as.factor
+Bicycle$weekend <-Bicycle$weekend %>% fct_recode("Weekend" = "TRUE","Weekday"  = "FALSE")
+Bicycle$weekend |> head()
+```
+
