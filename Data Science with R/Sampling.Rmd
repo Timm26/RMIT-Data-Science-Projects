@@ -52,6 +52,19 @@ n <- samp_size(z = z, E = E, sigma = sigma)
 print(ceiling(n)) # round up to the next integer
 ```
 
+# 4. Confidence intervals and hypothesis testing
+## 4.1 Confidence intervals
+
+Allow you to gauge the level of confidence you can attach to a point estimate like mean or proportion.
+
+- Is the population standard deviation known, use z-score
+- Is the population standard deviation unknown, use t-score
+
+## 4.1.1 Confidence interval for a population mean
+
+$$\text{CI = }\hat{x} \pm z_{\alpha/2}\frac{\sigma}{\sqrt{n}}$$
+- Standard error: $\frac{\sigma}{\sqrt{n}}$
+- Z = $\frac{\hat{X}-\mu}{\sigma / \sqrt{n}}$
 
 
 
