@@ -3,6 +3,12 @@ title: "Sampling"
 output: html_document
 ---
 
+```{r, message=FALSE}
+library(here)
+library(tidyverse)
+```
+
+
 # 1. Sampling in R
 
 - Sampling distribution: Distribution of all the possible values of a sample statistics for a given sample size selected from a population
@@ -27,7 +33,7 @@ CLT implies that a population mean can be estimated by obtaining a large enough 
 
 Calculation:
 
-$$n = (\frac{Z_{\alpha/2}\sigma}{E})^2$$
+$$n = (\frac{Z_{\alpha/2}*\sigma}{E})^2$$
 Where:
 - $E$ = Margin of error that we are willing to accept
 - $1 - \alpha$ = the probability that the magnitude of that error will not exceed
@@ -52,19 +58,158 @@ n <- samp_size(z = z, E = E, sigma = sigma)
 print(ceiling(n)) # round up to the next integer
 ```
 
-# 4. Confidence intervals and hypothesis testing
+# 4. Confidence intervals
 ## 4.1 Confidence intervals
 
 Allow you to gauge the level of confidence you can attach to a point estimate like mean or proportion.
 
 - Is the population standard deviation known, use z-score
-- Is the population standard deviation unknown, use t-score
+- Is the population standard deviation unknown, use t-score and substitude with the sample standard deviation $s$. Also $n-1$.
 
 ## 4.1.1 Confidence interval for a population mean
 
-$$\text{CI = }\hat{x} \pm z_{\alpha/2}\frac{\sigma}{\sqrt{n}}$$
+$$\text{CI (SD known) = }\hat{x} \pm z_{\alpha/2}\frac{\sigma}{\sqrt{n}}$$
 - Standard error: $\frac{\sigma}{\sqrt{n}}$
 - Z = $\frac{\hat{X}-\mu}{\sigma / \sqrt{n}}$
+
+### Example Z-Score
+
+```{r}
+# Example
+alpha = 0.05 # 1 - alpha of 95%
+Z = 1.96 # Z-score
+x_hat = 172.05 # Point estimate xhat
+sd = 6.35 # Standard deviation
+n = 10 # Sample
+# Calculation
+margin_of_error = Z * (sd/sqrt(n))
+lower_limit = x_hat - margin_of_error
+upper_limit = x_hat + margin_of_error
+glue::glue("A 95% confidence interval (known SD) 
+           limit goes from {round(lower_limit,2)}cm to {round(upper_limit,2)}cm for the self-reported height of men.")
+```
+
+### Example t-score
+
+$$\text{CI (SD unknwown) = }\hat{x} \pm t_{n-1,\alpha/2}*\frac{s}{n-1}$$
+
+We use the sample metrics as above:
+- X_hat of 172.05
+- n = 10
+- Significance level of 95% (1 - alpha / 2 in each tail)
+- BUT: Sample standard deviation now: 6.06
+
+```{r}
+# Calcualte the t-distribution and new margin of error
+sd_sample = 6.06
+t_score = qt(0.05/2, 9, lower.tail=FALSE) # alpha / 2 for each tail , n - 1 = 9
+margin_of_error_new = t_score * (sd_sample/sqrt(n))
+lower_limit_new = x_hat - margin_of_error_new
+upper_limit_new = x_hat + margin_of_error_new
+# Result
+glue::glue("A 95% confidence interval (unknwon SD) 
+           limit goes from {round(lower_limit_new,2)}cm to {round(upper_limit_new,2)}cm for the self-reported height of men.")
+```
+
+## 4.2 Confidence interval for a Population Proportion
+Examples:
+- What proportion of Australians are willing to take out a mortgage for up to five times their annual income?
+- What percentage of children aged 8-11 have their own smartphone?
+- What percentage of the population owened a car before they were 20?
+- Standard error of the point estimate for p = $\hat{p} = \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$
+- Sample proption $\hat{p} = \frac{\text{positive responses}}{\text{all responses}}$ 
+
+$$\text{CI_proportion} = \hat{p} \pm Z * \sqrt{\frac{\hat{p}*(1-\hat{p})}{n}}$$
+
+```{r}
+# Example
+# Imagine we are interested in the proportion of adults in Melbourne who watch movies on a tablet. A random survey was conducted which found that of the 400 people surveyed, 342 responded yes – they watch movies on a tablet. Compute a confidence interval estimate using a 95 per cent confidence level for the true proportion of adults who watch movies on a tablet. They either watch movies on a tablet or they don’t, so we know we are dealing with a binomial distribution where n = 400. Here then are the steps in calculating the confidence interval.
+
+# Values
+n <- 400
+phat <- 342 / n # Sample proportion
+SE_phat <- sqrt((phat * (1 - phat)) / n) # Standard Error
+Z <- qnorm(0.05/2, 0, 1, lower.tail=FALSE) # Z-Score
+# CI propotion
+lower_limit_pro <- phat - Z * SE_phat
+upper_limit_pro <- phat + Z * SE_phat
+glue::glue("We estimate with 95% confidence that the true proportion of adults in Melbourne who watch movies on their tablets is between {round(lower_limit_pro,2)}% and {round(upper_limit_pro,2)}%.")
+```
+
+### Sample size of proportions
+
+$$n = (\frac{Z_{\alpha/2}^2*\sigma^2}{ME^2})$$
+where:
+$\sigma^2 = p(1-p)$
+
+```{r}
+# Example for sample means
+# Suppose you want to derive a 95% confidence interval for the average number of hours per week that 8–11-year-old kids spend watching TV, where the margin of error is around 1 hour. You conduct a small pilot study and obtain a sample standard deviation of 3.5 hours.
+
+n = ((1.96^2)*(3.5)^2)/1^2
+ceiling(n)
+```
+
+```{r}
+# Example for sample proportion
+# Suppose you want to derive a 95% confidence interval for the proportion of 8–11-year-old kids who are allowed to take their smartphone to bed, where the margin of error is 10%. You conduct a small pilot study and obtain an initial estimate of 40% being allowed to take their smartphone to bed.
+
+p = 0.4
+n = ((1.96^2)*p*(1-p))/0.1^2
+ceiling(n)
+```
+
+
+# 5. Hypothesis testing
+## 5.1 Fundamentals of hypothesis testing
+
+Six Step procedure:
+1. Frame your competing hypotheses in terms of parameter of interest
+2. Assume the null hypothesis is true $H_0$
+3. Choose your significance level $\alpha$
+4. Calculate the observed value of the test statistic from your random sample
+5. Calculate the p-value and compare it with your significance elvel
+6. Reject your null hypothesis if and only if the p-value < significance level $\alpha$
+
+Which hypothesis test to use? For Z-test you need:
+- Sample size greater than 30
+- Known population standard deviation
+-> Is one not fulfilled, use t-test.
+
+## 5.2 Hypthesis testing for one sample
+
+- One-tail hypothesis test: Used, when interested in whether the value of the parameter of interest is less the value specified in the null hypothesis *OR* parameter of interest is greater the value specified in the null hypothesis (NOT BOTH). $H-0: \mu = 0$ versus $H_a: \mu > 0$ *OR* $H_a: \mu < 0$
+- Two-tail hypothesis test: Used, when interested in whether the value of the parameter of interest differs (either above or below) from the value specified in the null hypothesis. $H_0: \mu = 1000$, $H_a: \mu \neq 1000$
+
+### Applying a z-test for one sample
+
+```{r}
+# The aim of this example is to test the hypothesis that people working in profession 7 have an IQ higher than average, at a significance level of 5%. Note that IQ test scores are calculated based on a normed group with average 100 and a standard deviation 15. 
+iq_df <- read.csv(here("ZDatasets","IQ.csv"))
+head(iq_df)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
