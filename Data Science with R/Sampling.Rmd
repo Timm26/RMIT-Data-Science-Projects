@@ -189,7 +189,38 @@ iq_df <- read.csv(here("ZDatasets","IQ.csv"))
 head(iq_df)
 ```
 
+```{r}
+# Subset profession 7
+profession7 <- iq_df |> filter(Profession == 7)
+# Check the sample size
+profession7$IQ |> length()
+```
 
+Since the population SD is known and the sample size is large, a z-test is conducted.
+
+```{r}
+population_sd <- 15
+population_mu <- 100
+n <- profession7$IQ |> length()
+x_bar <- mean(profession7$IQ)
+SE <- population_sd / sqrt(n)
+z_score <- (x_bar - population_mu) / SE
+sig_level <- 0.05
+
+# Upper tail test has p-value = P(Z > z)
+p_value = pnorm(z_score, lower.tail=FALSE)
+cat(paste("p-value: ", p_value))
+```
+
+Based on the p-value and the significance level (0.05), we can conclude our findings.
+
+```{r}
+statement = c("the null hypothesis at the 5% significance level.",
+"\nConclude that those working in profession 7 have")
+true = c("Reject", statement, "\na higher average IQ than the overall population.")
+false = c("Fail to reject",statement, "\nthe same IQ as the overall population.")
+if (p_value < sig_level) cat(paste(true)) else cat(paste(false))
+```
 
 
 
