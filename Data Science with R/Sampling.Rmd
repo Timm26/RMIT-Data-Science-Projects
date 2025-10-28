@@ -222,6 +222,19 @@ false = c("Fail to reject",statement, "\nthe same IQ as the overall population."
 if (p_value < sig_level) cat(paste(true)) else cat(paste(false))
 ```
 
+### Applying a t-test for one sample
+
+- If sample size is small (n < 31)
+- If population SD is unknown
+
+The procedure is nearly identical, we just calculate the t-value and degrees of freedom (df = n-1).
+
+- `pt(t_score, df)` # For one-tail test, smaller than P(t < t_score)
+- `1 - pt(t_score, df)` # For one-tail test, greater than P(t > t_score)
+
+```{r}
+# Example
+```
 
 
 
