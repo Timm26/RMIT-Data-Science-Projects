@@ -168,7 +168,7 @@ Six Step procedure:
 2. Assume the null hypothesis is true $H_0$
 3. Choose your significance level $\alpha$
 4. Calculate the observed value of the test statistic from your random sample
-5. Calculate the p-value and compare it with your significance elvel
+5. Calculate the p-value and compare it with your significance level
 6. Reject your null hypothesis if and only if the p-value < significance level $\alpha$
 
 Which hypothesis test to use? For Z-test you need:
@@ -232,13 +232,42 @@ The procedure is nearly identical, we just calculate the t-value and degrees of 
 - `pt(t_score, df)` # For one-tail test, smaller than P(t < t_score)
 - `1 - pt(t_score, df)` # For one-tail test, greater than P(t > t_score)
 
-```{r}
+#### Example
+
+We have some diameter data (in cm) for a motorcycle brake disc manufacturer. The manufacturer claims their brake diameter is in keeping with the regulation diameter of 12 inches (30.48 cm) for this part. Conduct a two tailed test at 5% significance level to decide whether we should reject the manufacturer’s claim.
+
+$$H_0: \mu = 30.48$$
+$$H_a: \mu \neq 30.48$$
+```{r, messages=FALSE}
 # Example
+brakes_df <- read_csv(here("ZDatasets","new_disc_brakes.csv"))
+brakes_df |> head()
 ```
 
+Check the length of brakes data.
+```{r}
+length(brakes_df$brake_diameter)
+```
 
+Hence the dataset is small and the population standard deviation was not provided, we will require a t-test. However, due to our sample size we must check to see whether our sample data exhibits a normal distribution.
 
+```{r}
+# Assess normality
+ggplot(brakes_df,aes(x=brake_diameter)) +
+  geom_histogram(bins = 7, color = 'white', fill='steelblue') +
+  labs(x = "x", y = "Frequency", title = "Histogram of brake disc diameter (cm)") +
+  geom_vline(xintercept = 30.48, color = "red")
+```
 
+The data looks normality distributed, more test are usually required (Shapiro-Wilk-test).
+
+```{r}
+# Now that we can assume normality, we can perform a t-test
+t.test(brakes_df$brake_diameter, alternative = "two.sided", mu = 30.48)$p.value
+
+```
+
+Our p-value of 0.017 suggests we reject the manufacturer's claim. p-value (0.017) < significance level 0.05.
 
 
 
