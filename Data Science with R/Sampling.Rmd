@@ -270,7 +270,85 @@ t.test(brakes_df$brake_diameter, alternative = "two.sided", mu = 30.48)$p.value
 Our p-value of 0.017 suggests we reject the manufacturer's claim. p-value (0.017) < significance level 0.05.
 
 
+## 5.3 Hypothesis testing for two samples
 
+This time it is the differences between the group means or proportions that are in focus. You will need to check whether the samples are drawn from two independent (unrelated) populations, or from two dependent (related).
+
+### 5.3.1 Hypothesis testing for the means of two samples
+
+The following conditions need to be met for large samples n > 30:
+- Both datasets have been chosen based on simple random sampling
+- Both samples are large
+
+The following conditions need to be met for small samples n < 31:
+- Both datasets have been chosen based on simple random sampling
+- One or both samples are small
+- Both populations are normally distributed
+
+#### 5.3.1.1 Checking the assumption of normality and equal variances
+
+```{r}
+# Get the data
+rareetals_df <- read_csv(here("Zdatasets","rare_metal_concentrations.csv"))
+head(rareetals_df,3)
+```
+
+Our hypothesis are:
+
+$$H_0: \mu_{\text{Location1}} = \mu_{\text{Location2}}$$
+$$H_0: \mu_{\text{Location1}} \neq \mu_{\text{Location2}}$$
+
+```{r}
+# Summary statistics
+stats_Location1 <- summarise(rareetals_df,
+                             mean = mean(rareetals_df$Location.1, na.rm=TRUE),
+                             sd = sd(rareetals_df$Location.1, na.rm = TRUE),
+                             n = sum(!is.na(rareetals_df$Location.1)))
+stats_Location1
+```
+
+```{r}
+# Summary statistics
+stats_Location2 <- summarise(rareetals_df,
+                             mean = mean(rareetals_df$Location.2),
+                             sd = sd(rareetals_df$Location.2),
+                             n = sum(!is.na(rareetals_df$Location.2)))
+stats_Location2
+```
+
+Check the assumption of normality using Shapiro-Wilk test:
+
+The null hypothesis of this test is that the data is normally distributed. The alternative is that the data has a non-normal distribution. If p-value < 0.05 then reject normality. Otherwise do not reject if the p-value > 0.05.
+
+```{r}
+p_val_1 <- shapiro.test(rareetals_df$Location.1)
+p_val_2 <- shapiro.test(rareetals_df$Location.2)
+# Print the result
+cat(paste("p-value for testing normality of Location 1 = ", p_val_1$p.value,'\n'))
+cat(paste("p-value for testing normality of Location 2 = ", p_val_2$p.value))
+```
+
+Check the assumption of equal variances
+
+```{r}
+ratio <- stats_Location1$sd / stats_Location2$sd
+ratio
+```
+
+As the ratio belongs to the interval (-0.5,2) we assume equal variances.
+
+Two samples t-test:
+
+Now since all assumptions are met:
+
+```{r}
+t.test(rareetals_df$Location.1, rareetals_df$Location.2,
+       alternative = "two.sided", paired = FALSE, var.equal = TRUE)
+```
+
+Since p-value (0.062) > significance level (0.05) you fail to reject the hypothesis of equal means and conclude that there is no significant difference between the rare metal concentrations at the two locations.
+
+### 5.3.2 Comparing two proportions with large samples
 
 
 
