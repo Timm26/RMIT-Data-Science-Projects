@@ -1,0 +1,211 @@
+---
+title: "Immigration in AU"
+output: html_document
+date: "2025-12-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Setup**
+
+Install and load the packages you need to produce the report here:
+
+```{r, echo = TRUE, warnings = FALSE}
+# Importing necessary libraries
+library(readr) # Useful for importing data
+library(foreign) # Useful for importing SPSS, SAS, STATA etc. data files
+library(rvest) # Useful for scraping HTML data
+library(knitr) # Useful for creating nice tables
+library(tidyverse)
+library(readxl)
+```
+
+
+
+# **Instructions** 
+
+This project will focus on the data pre-processing and visualisation of the immigration in Australia from 2000 until 2025. We will locate the dataset on the web, import it into R, inspect the data, apply tidy data principles on the data and manipulate the data to gain further insights. Finally, I will visualise our pre-processed dataset to gain an understanding of the trend of the past immigration into Australia.
+
+This project is linked to the university of RMIT's course MATH2405 | Data Wrangling and | Data Visualisation and Communication.
+
+
+
+### **Data Description**
+
+Our dataset contains the following variables: 
+
+* bullet point 1
+* bullet point 2
+* ....
+
+
+
+## 1. **Import Data**
+
+First, we will import the dataset.
+
+
+```{r, message=FALSE, echo=FALSE}
+# Import the data
+url <- "https://data.gov.au/data/dataset/2fe5e2a9-8a3d-4dcf-baec-c5147d953150/resource/b59a15df-86ea-4c4c-95be-4dd9fc9f8ac4/download/2024-25-historical-migration-statistics.xlsx"
+tmp <- tempfile(fileext = ".xlsx")
+download.file(url, tmp, mode = "wb")
+```
+
+### 1.1 Sheet 1 - Year 1975 to 1995
+
+```{r}
+# Read the first sheet Year 1975 - 1995
+df_1_3 <- read_excel(tmp, sheet = "1.3", skip=3)
+
+# Rename the last column to 'Total' and slice the last excel rows that don't add value
+df_1_3 <- df_1_3 |> rename(Total_Original = ...266) |> slice(-21:-26)
+
+# Display the variables that contain 'total' or 'Total'
+colnames(df_1_3)[str_detect(colnames(df_1_3),"Total|total")]
+
+# Subset all Total Regions
+df1 <- df_1_3 |> select(Year, `Oceania total`, `Europe total`, `The Former USSR and the Baltic States total`, `North Africa & the Middle East Total`, `Africa excl North Africa total`, `Southeast Asia total`, `Northeast Asia total`, `Southern Asia total`,`Northern America total`, `South America, Central America & the Caribbean total`, `Other & Not Stated`, Total_Original)
+
+# Display the subset
+df1 |> View()
+```
+
+The column "Other & Not Stated" is type character since some values are "<5", let's change those cells to '5' so we can change the type to a numeric column.
+
+```{r}
+# Change the cell
+df1$`Other & Not Stated`[df1$`Other & Not Stated` == "<5"] <- 5
+df1$`Other & Not Stated` <- df1$`Other & Not Stated` |> as.numeric()
+```
+
+
+Next, we need to check if the variables add up to the column:
+
+```{r}
+# Check if columns 2-11 equal column 12
+df1$check <- rowSums(df1[, 2:12], na.rm=TRUE) - df1[[13]]
+df1$check
+```
+
+The difference is very marginal and might be due to some rounding errors. Multiple cells contained <5 as their value. We can add a new column with the adjusted Total.
+
+```{r}
+# Add the new column
+df1$Total_new <- df1$Total_Original + rowSums(df1[, 2:12], na.rm=TRUE) - df1[[13]]
+
+# Display the new Total column
+df1 |> select(Total_Original, check, Total_new) |> head(3)
+```
+
+Let's drop the unnecessary columns Total_Original and check.
+
+```{r}
+# Drops 
+df1 <- df1 |> select(-c(Total_Original, check))
+df1 |> head(3)
+```
+
+### 1.1 Sheet 2 - Year 1995 to 1996
+
+```{r}
+# Import the new sheet
+df_1_4 <- read_excel(tmp, sheet = "1.4", skip=3)
+
+# Delete unnecessary rows
+df_1_4 <- df_1_4 |> slice(-2:-7)
+df_1_4 <- df_1_4 |> rename(Total_Original = ...268)
+df_1_4 |> colnames()
+```
+
+Again, let's subset the total columns:
+
+```{r}
+colnames(df_1_4)[str_detect(colnames(df_1_4),"Total|total")]
+```
+
+
+
+### **Inspect dataset and variables**
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk where you inspect the types of variables, data structures, and check the attributes of the data.
+
+
+```
+
+
+
+### **Tidy data** 
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk where you check whether the data conforms to the tidy data principles and, if it doesn't, then reshape your data into a tidy format.
+
+
+```
+
+
+
+### **Create a list**
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk where you create a list
+
+
+```
+
+
+
+### **Join the list**
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk where you join the list
+
+
+```
+
+
+
+### **Subsetting (10 observations)**
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk to subset your data and convert it to a matrix 
+
+
+```
+
+
+
+### **Subsetting (first and last variable)**
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk to subset your data and convert it to an R object file 
+
+
+```
