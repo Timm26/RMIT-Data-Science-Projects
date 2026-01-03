@@ -44,16 +44,18 @@ First, we will import the dataset.
 
 ```{r, message=FALSE, echo=FALSE}
 # Import the data
-data <- readxl::read_excel("../ZDatasets/Data_Total_Movement_AU.xlsx", col_names = FALSE, sheet = 2, skip = 10)
+df <- readxl::read_excel("../ZDatasets/Data_Total_Movement_AU.xlsx", col_names = FALSE, sheet = 2, skip = 10)
 
 # Get the columns
 first_row <- readxl::read_excel("../ZDatasets/Data_Total_Movement_AU.xlsx", col_names = FALSE, sheet = 2, n_max =1)
-colnames(data) <- c("Year",first_row)
-head(data)
+colnames(df) <- c("Date",first_row)
+head(df)
 ```
 
 
 ### **Inspect dataset and variables**
+
+This section represents the EDA of our dataset. We will not modify the original dataset and instead look at copy of our original data. All data preprocessing steps will be taken in the later 'Tidy data' section.
 
 - Check structure
 - Data types / column names
@@ -63,11 +65,83 @@ head(data)
 
 
 ```{r}
-# This is a chunk where you inspect the types of variables, data structures, and check the attributes of the data.
-
-
+# Dataframe structure
+data <- df # only works due to R's copy-on-modity (copy-on-write) semantic
+glimpse(data)
 ```
 
+Our dataset contains 598 rows and 12 columns. The first column `Year` is a date while all other features are doubles with the exception of 4 columns. We can further inspect the columns to identify why those columns aren't numerical. `glimpse` gives us a first hint hence those four columns contains `NA` values.
+
+```{r}
+# Check missing values
+cat("Missing total values:", sum(is.na(data)),'\n')
+
+# Check NA per column
+sapply(data, function(x) sum(is.na(x)))
+
+# Check total rows
+cat("\nTotal rows:",nrow(data))
+```
+
+All logical columns contain 598 of missing values - all entries are `NA`. The best practice for our data preprocessing would be to drop those columns are they don't contain any information. Since all columns have the identical name, it is very likely those columns were replicated by error.
+
+Next, let's check our column names:
+
+```{r}
+# Column names
+names(data)
+```
+
+We should amend the column names to for easier reference and understanding. In our data preprocessing, it might be best practice to shorten the column names - e.g. "Number of movements ; Permanent Arrivals ;" to "Permanent Arrivals".
+
+Let's continue by exploring if any columns contain an excessive amount of zero-values:
+
+
+```{r}
+library(lubridate)
+library(dplyr)
+# Get the year of each row
+data$Year <- lubridate::year(data$Date)
+
+# Exclude the NA columns
+subset_data = data[, colSums(is.na(data)) == 0]
+subset_data
+```
+
+
+```{r}
+# Checking zero values 
+zero_values <- subset_data |> group_by(Year) |>  
+  summarise(
+    across(
+      where(is.numeric),
+      ~ sum(. == 0, na.rm = TRUE),
+      .names = "zeros_{.col}"
+    ),
+    .groups = 'drop'
+)
+
+head(zero_values)
+```
+
+```{r}
+# Summarise the result
+sum(zero_values[2:ncol(zero_values)])
+```
+The whole dataset doesn't contain any null-values.
+
+Lastly, let's check the distribution of the numerical values:
+
+```{r}
+# Drop columns
+subset_data$Date <- NULL
+
+# Loop over the columns
+par(mfrow = c(3,3))
+for (col in names(subset_data)) {
+  hist(subset_data[[col]], main = col)
+}
+```
 
 
 ### **Tidy data** 
