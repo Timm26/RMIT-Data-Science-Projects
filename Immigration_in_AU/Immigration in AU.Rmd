@@ -20,21 +20,33 @@ library(rvest) # Useful for scraping HTML data
 library(knitr) # Useful for creating nice tables
 library(tidyverse)
 library(readxl)
+library(ggplot2)
+library(patchwork)
 ```
 
 
 ### **Data Description**
 
-1. Where it stems from
-2. What it is about
-3. Can be found where + link
-4. Consists of x rows and y columns
+The dataset used in this analysis is sourced from the Australian Bureau of Statistics (ABS) and is part of the Overseas Arrivals and Departures, Australia collection. It provides official statistics on international movement into Australia over time, capturing both permanent and temporary arrivals.
 
-Our dataset contains the following variables: 
+The data focuses on total movements to Australia, disaggregated by visa type and residency status, allowing for analysis of long-term trends in migration and travel patterns.
 
-* bullet point 1
-* bullet point 2
-* ....
+The dataset can be accessed via the ABS website at:
+[ABS](https://www.abs.gov.au/statistics/industry/tourism-and-transport/overseas-arrivals-and-departures-australia/latest-release#data-downloads)
+
+#### Variables
+
+The dataset contains the following key variables:
+
+- Date – Monthly observation date
+- Year – Calendar year extracted from the date
+- Permanent Arrivals – Number of permanent migrants arriving in Australia
+- Long-term Residents Returning – Australian residents returning after long-term travel
+- Long-term Visitors Arriving – Overseas visitors arriving for long-term stays
+- Permanent and Long-term Arrivals – Combined permanent and long-term arrivals
+- Short-term Residents Returning – Residents returning after short-term travel
+- Short-term Visitors Arriving – Overseas visitors arriving for short-term stays
+- Total Arrivals – Total number of arrivals across all categories
 
 
 
@@ -55,7 +67,7 @@ head(df)
 
 ### **Inspect dataset and variables**
 
-This section represents the EDA of our dataset. We will not modify the original dataset and instead look at copy of our original data. All data preprocessing steps will be taken in the later 'Tidy data' section.
+This section represents the EDA of our dataset. We will not modify the original dataset and instead look at a copy of our original data. All data preprocessing steps will be taken in the later 'Tidy data' section.
 
 - Check structure
 - Data types / column names
@@ -128,7 +140,7 @@ head(zero_values)
 # Summarise the result
 sum(zero_values[2:ncol(zero_values)])
 ```
-The whole dataset doesn't contain any null-values.
+The whole dataset doesn't contain any null-values. 
 
 Lastly, let's check the distribution of the numerical values:
 
@@ -137,89 +149,171 @@ Lastly, let's check the distribution of the numerical values:
 subset_data$Date <- NULL
 
 # Loop over the columns
-par(mfrow = c(3,3))
+par(mfrow = c(3,3)) # Display 3x3 visuals
 for (col in names(subset_data)) {
   hist(subset_data[[col]], main = col)
 }
 ```
 
+We can see that most of our data is right-skewed except for `Permanent Arrivals` and `Year`.
+
+Since we do not have any categorical variables, we can now continue to clean and tidy our dataset. Let's summarise the issues we encountered:
+
+- Drop NA columns
+- Rename columns
+- Fix right-skewed data
 
 ### **Tidy data** 
 
-Tidy principles by Wickham & Grolemund:
+This section focuses on the tidy principles by Wickham & Grolemund:
 
 1. "Each variable in our dataset must form its own column
 2. All 10000 observation must form their own rows
 3. Each cell represents one value” (check if values hide lists)
 
+Typical steps for this section:
 - Create a copy of the dataset
 - Fix missing values (e.g. categorical with mode or 'unknown', numeric with mean)
+- Fix all previous discovered issues
 - Create summary statistics
 
-Write your plain text here.
+Let's start our preprocessing by creating another copy of our original dataset and amending the column names to be more precised:
+
+```{r}
+# Create a copy but ignores the columns with NA values, and adds the year
+immigration <- df[, colSums(is.na(df)) == 0]
+immigration$Year <- lubridate::year(immigration$Date)
+
+# Fix the column names
+names(immigration)
+```
+
+```{r}
+# Change the column names
+new_column_names <- c("Permanent Arrivals", "Long-term_Residents returning", "Long-term Visitors arriving", "Permanent and Long-term Arrivals", "Short-term Residents returning", "Short-term Visitors arriving", "Total Arrivals")
+
+colnames(immigration)[2:(ncol(immigration) - 1)] <- new_column_names
+
+names(immigration)
+```
+
+Before we continue, let's check if our dataset fullfills the 3rd rule - each cell must represent one value. In R, this will mean that no cell can contain e.g. a list:
+
+```{r}
+# Check if any row contains a cell with a list
+vapply(immigration, is.list, logical(1))
+```
+
+Lastly, to further understand the full scale of `Total Arrivals`, let's create some summary statistics:
+
+```{r}
+immigration |> group_by(Year) |> 
+  summarise(
+    Mean_TA = mean(`Total Arrivals`),
+    Median_TA = median(`Total Arrivals`),
+    Min_TA = min(`Total Arrivals`),
+    Max_TA = max(`Total Arrivals`),
+    SD_TA = sd(`Total Arrivals`)
+  )
+```
+
+Let's see if there are any outliers. To ensure multiple boxplots are being formed, we will group Year into 5-year categories.
+
+```{r}
+immigration <- immigration |> mutate(year_cat = cut(
+  Year,
+  breaks = seq(min(Year), max(Year) + 5, by = 5),
+  labels = c(
+    "1975–79", "1980–84", "1985–89", "1990–94",
+        "1995–99", "2000–04", "2005–09", "2010–14",
+        "2015–19", "2020–24"),
+  right = FALSE)
+)
+```
 
 
 ```{r}
-
-# This is a chunk where you check whether the data conforms to the tidy data principles and, if it doesn't, then reshape your data into a tidy format.
-
-
+# First plot
+p1 <- ggplot(immigration, aes(x = year_cat, y = `Total Arrivals`)) + 
+  geom_boxplot()
+# Comparison
+p2 <- ggplot(immigration, aes(x=Year, y=`Total Arrivals`)) + 
+  geom_line()
+# Display both using library `patchwork`
+p1 | p2
 ```
 
+We can see that the total arrival into Australia is growing over the last 35 years, with the exception of 2020-2023, during the covid pandemic.
 
 
 ### **Create a list**
 
-- Numerical representation of a factor
-- df_list <- setNames(as.list(as.numeric(factor(levels(df$`Residential Type`)))),level
-s(df$`Residential Type`))
+We create a list `my_list` which will be a list of the variable `Total` named by `year_cat`.
 
 
 ```{r}
-
-# This is a chunk where you create a list
-
-
+# Create a named list that summarises the `Total Arrivals` per year category
+# Let's inspect what we want to have as a named list
+summary_df <- immigration |> group_by(year_cat) |> summarise(Total = sum(`Total Arrivals`))
+summary_df
 ```
 
+```{r}
+my_list <- setNames(
+  as.list(summary_df$Total), summary_df$year_cat)
 
+my_list
+```
 
 ### **Join the list**
 
-Join list with dataframe
+We now convert our named list into a dataframe:
 
 
 ```{r}
-
-# This is a chunk where you join the list
-
-
+# Create a data frame
+data2 <- data.frame(
+  `Year_cat` = names(my_list),
+  `Total Immigration` = unlist(my_list))
+# Remove row names
+rownames(data2) <- NULL
+# Display the result
+head(data2)
 ```
 
-
-
-### **Subsetting (10 observations)**
-
-Write your plain text here.
-
+To join dataframes, let's create a second dataframe that contains of the same `Year_cat` column but randomly assigns a country of origin to each year group - simulating which country migrated the most in that year period.
 
 ```{r}
+# Excourse - let's create 10 random countries
+set.seed(123)
+str(data2)
 
-# This is a chunk to subset your data and convert it to a matrix 
+countries <- c("USA","Germany","France","Spain","Italy","Poland","Denmark","Sweden","China","India","NZ","Japan","Korea","Thailand","Indonesia")
 
+data3 <- data.frame(
+  `Year_cat` = names(my_list),
+  `country` = sample(countries, nrow(data2), replace = TRUE))
 
+head(data3)
 ```
 
+Let's now join the dataframes:
+
+```{r}
+# Joined dataframe:
+joined_df <- data2 |> left_join(data3, by = "Year_cat")
+joined_df
+```
 
 
 ### **Subsetting (first and last variable)**
 
-Write your plain text here.
+Lastly, we crosscheck if our `Date` and `year_cat` variable are matching:
 
 
 ```{r}
-
-# This is a chunk to subset your data and convert it to an R object file 
-
-
+# Subset the first and last variable
+immigration |> dplyr::select(1, ncol(immigration))
 ```
+
+This concludes the Assignment 1 of MATH2405 Data Wrangling - RMIT. 
