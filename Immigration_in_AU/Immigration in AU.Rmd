@@ -316,4 +316,4 @@ Lastly, we crosscheck if our `Date` and `year_cat` variable are matching:
 immigration |> dplyr::select(1, ncol(immigration))
 ```
 
-This concludes the Assignment 1 of MATH2405 Data Wrangling - RMIT. 
+This concludes the Assignment 1 of MATH2405 Data Wrangling - RMIT. Assignment 2 and 3 will focus more on further EDA and data preprocessing with a more complicated dataset.
