@@ -434,6 +434,11 @@ outliers_rev_per_head <- copy$revenue_per_head[copy$revenue_per_head < lower |
 outliers_rev_per_head
 ```
 
+```{r}
+copy$revenue_per_head
+```
+
+
 Looking at the histogram of `revenue_per_head` and all outliers it doesn't look like those values are an error and some stores are just standing out in terms of revenue per staff member. No data preprocessing will be needed here.
 
 Another way of displaying outliers is by calculating the z-score and filtering all values lower than 3 standard deviations or bigger than 3 standard deviations:
@@ -492,26 +497,49 @@ hist(copy$revenue_per_head, main = "Revenue per head", xlab=NULL)
 hist(copy$happy_score, main = "Happy Score", xlab=NULL)
 ```
 
-In this instance we do not have any left-skewed data, if we did, we could use a power transformation or boxcox transformation. Let's apply a boxcox transformation on `revenue` even though the variable is already meeting the assumption of normality:
+In this instance we do not have any left-skewed data, if we did, we could use a power transformation or boxcox transformation. Let's apply a boxcox transformation on `revenue`:
 
 ```{r}
-# Testing normality
-shapiro.test(copy$revenue)
+# Boxcox requires strictly positive values
+all(copy$revenue > 0)
+
+# Since this is true - apply Boxcox
+bc <- forecast::BoxCox(copy$revenue, lambda = "auto")
+lambda <- round(attr(bc, which = "lambda"),3)
+
+# Display both plots
+par(mfrow = c(2,1))
+hist(copy$revenue, main = "Histogram of Revenue before BoxCox transformation", breaks = 25,
+     xlab = "Revenue (original)")
+hist(bc, main = glue::glue("Histogram of Revenue after BoxCox transformation {lambda}"),
+     breaks = 25, col='green', xlab = "Revenue (transformed)")
 ```
-Since 
+
+This transformation didn't really add any value and our data is still not normally distributed:
+
+```{r}
+# Shapiro Wilk test - p <= 0.05 reject H_0 of normality
+shapiro.test(bc)
+```
+
+This power transformation didnt change the distribution.
 
 ## Summary statistics
 
-Write your plain text here.
+The below calculates several summary statistics of our GYG dataset.
 
 
 ```{r}
-
-# This is a chunk where you produce summary statistics.
-
+# Display some summary statistics
+copy |> 
+  summarise(
+    mean_rev_per_head = mean(revenue_per_head, na.rm=TRUE), # all na values are removed
+    min_staff = min(staff, na.rm = TRUE),
+    total_stores = n_distinct(store_id, na.rm = TRUE),
+    median_happy_score = median(round(happy_score,3), na.rm = TRUE),
+    max_age = max(age),
+    .groups = "drop") # ensures the resulting df will no longer be grouping var after the
+                      # result has been displayed (Tidyverse, 2016)
 ```
 
-
-
-<br>
-<br>
+This finishes the analysis of our synthetic dataset.
