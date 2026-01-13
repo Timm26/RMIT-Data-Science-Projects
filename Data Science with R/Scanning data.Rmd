@@ -48,7 +48,7 @@ pet1$Reference |> head() # Checking
 ```{r}
 pet1 |> 
   filter(is.na(Reference)) |> 
-  select(id, State, Region, Reference, Animal_Name) |> 
+  dplyr::select(id, State, Region, Reference, Animal_Name) |> 
   head()
 ```
 
@@ -153,7 +153,8 @@ Imputing a variable in a dataframe:
 ```{r}
 # Get the column
 pet1 |> 
-  filter(is.na(Colour_primary)) |> select(id, State, Region, Animal_Name, Colour_primary)
+  filter(is.na(Colour_primary)) |> 
+  dplyr::select(id, State, Region, Animal_Name, Colour_primary)
 ```
 
 How to impute variable with their variable's mode:
@@ -163,7 +164,8 @@ How to impute variable with their variable's mode:
 pet1$Animal_Name %<>% impute(pet1$Animal_Name, fun = mode)
 pet1$Colour_primary %<>% impute(pet1$Colour_primary, fun = mode)
 pet1 |> 
-  filter(is.na(Colour_primary)) |> select(id, State, Region, Animal_Name, Colour_primary)
+  filter(is.na(Colour_primary)) |> 
+  dplyr::select(id, State, Region, Animal_Name, Colour_primary)
 ```
 
 How to impute variable with their variable's mean:

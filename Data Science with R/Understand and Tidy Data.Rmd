@@ -19,10 +19,10 @@ iris <- read_csv(here("ZDatasets","iris.csv"))
 ## 1.1 Inspect the structure
 
 ```{r}
-str(iris1)
+str(iris)
 # names(iris1) # Shows column names but so does 'str()'
 # Number of variables in the dataset
-paste0("Number of variables: ",length(as.list(names(iris1))))
+paste0("Number of variables: ",length(as.list(names(iris)))) # ncol(iris)
 ```
 
 ## 1.2 Types of variables
@@ -49,6 +49,7 @@ iris$Species <- factor(iris$Species,
                        # Can be ordered = True
 is.factor(iris$Species)
 ```
+
 
 ```{r}
 # Print the individual categories
@@ -135,6 +136,7 @@ head(table3)
 table3 |> 
   separate(rate, into = c("cases", "population"), sep ='/') |> head()
 ```
+
 
 ## 4.3 unite() function
 

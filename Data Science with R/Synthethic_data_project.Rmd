@@ -1,0 +1,517 @@
+---
+title: "Data Wrangling Assessment Task 2: Creating and pre-processing synthetic data"
+author: "Insert student name and number here"
+subtitle: 
+output: 
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf: default
+---
+
+## Setup 
+
+Insert and load the packages you need to produce the report here:
+```{r, message=FALSE}
+# This is a chunk where you can load the packages required for producing the report
+set.seed(123)
+library(tidyverse)
+library(magrittr)
+```
+
+
+## Instructions
+In this assessment we are working as a data analyst of Guzman Y Gomez, an expanding Mexican fast food chain. We will generate and pre-process realistic synthetic data relevant to this brand.
+
+Our dataset must be realistic and will contain imperfections as real data can be random and messy, contain missing values and outliers. 
+
+```{r}
+# Function to create slightly right-skewed data with 5 outlier
+right_skewed_data <- function(n,mean,sd,outlier_min,outlier_max){
+rnorm(n, mean=mean, sd=sd) %>%
+{ . * (1+ runif(n, min=0, max=0.3)) } %>%
+c(., runif(5, min=outlier_min, max=outlier_max))}
+
+example_data_test_result <- right_skewed_data(950, 65, 5,10,100)
+summary(example_data_test_result)
+
+hist(example_data_test_result)
+```
+
+
+
+## Data Description 
+
+In this section, we will create three synthetic datasets each between 50 and 100 rows and 5-10 variables.
+
+Our first dataset is about our sales:
+
+* bullet point 1
+* bullet point 2
+* ....
+
+
+```{r}
+suburbs <- c("Fitzroy", "Fitzroy Norht", "South Yarra", "St. Kilda", "Carlton", "Brighton", "Williamstown", "Altona", "Albert Park", "Footscray", "Yarraville", "Moonee Ponds", "Essendon", "Hawthorn", "Cranbourne", "Berwick")
+profit_cat <- c("Very low", "Low", "Medium", "Somewhat High", "High", "Very High")
+ratings_cat <- c("Improvable", "Imbrofable", "improvable", "Average", "average", "aaverage", "AVERAGE", "Good", "good", "GOOD", "god", "Popular", "POPULAR", "popular", "pop", "pobular")
+ratings_prob <- c(0.1, 0.025, 0.075, 0.15, 0.05, 0.025, 0.025, 0.15, 0.1, 0.0125, 0.0125, 0.15, 0.1, 0.0125, 0.00625, 0.00625)
+
+# stores
+stores <- data.frame(
+  store_id = sample(150,150,replace=FALSE),
+  revenue = rdunif(150, 10000, 20000),
+  suburb = sample(size=150, suburbs, replace = TRUE),
+  staff = rdunif(150, 5,15),
+  profitability = sample(profit_cat, size = 150, replace = TRUE, prob = c(0.05, 0.225, 0.325, 0.225, 0.125, 0.05)),
+  always_open = sample(c("YES","NO","no","yes","Yes","No"), size=150, replace=TRUE) |> as.factor(),
+  customer_rating = sample(ratings_cat, size=150, replace=TRUE, prob=ratings_prob)
+)
+
+# Outliers
+sales$revenue[sample(1:nrow(sales), 15)] <- round(rnorm(15, mean = 18500, sd = 500),0)
+sales$always_open[sample(1:nrow(sales), 10)] <- NA
+sales$customer_rating[sample(1:nrow(sales), 8)] <- NA
+
+sales
+```
+
+```{r}
+library(randomNames)
+email_prov <- c("gmail.com","gggmail.com","yahoo.com","yohoo.com", "gmx.com", "apple.me", "aple.com","webmail.com", "outlook.com", "hotmail.com", "zoho.com","zho.com", "live.com", "fastmail.com","fasstmail", "hushmail.com")
+email_prov_prop <- c(0.9, 0.02, 0.9, 0.02, 0.9, 0.9, 0.02, 0.9, 0.9, 0.9, 0.9, 0.02, 0.9, 0.9, 0.02, 0.9)
+first_name = randomNames(150, which.names = "first")
+last_name = randomNames(150, which.names = "last")
+
+# employees
+staff <- data.frame(
+  staff_id = sample(as.character(1:150),size=150, replace = FALSE),
+  store_id = sample(150,150,replace=FALSE),
+  first_name = first_name,
+  last_name = last_name,
+  birthday = sample(seq(as.POSIXct("1970/01/01"), as.POSIXct(today() - lubridate::years(18)), by = "day"), size = 150, replace = TRUE),
+  email = paste0(first_name,".", last_name, "@", sample(email_prov,150, replace=TRUE, prob = email_prov_prop)),
+  age = as.integer(year(today())) - as.integer(year(staff$birthday)) -1)
+
+staff$email[sample(1:nrow(staff), 18)] <- NA
+staff$age[sample(1:nrow(staff), 3)] <- 150
+
+staff
+```
+
+Lastly, we create a table which lists items that are out of stock at that current branch.
+
+
+```{r}
+# Define all products Subway sells
+sandwiches <- c("Black Forest Ham","Buffalo Chicken","B.L.T","Cold Cut Combo","Grilled Chicken","Italien B.M.T","Meatball Marinara","Oven-Roasted Turkey","Oven-Roasted Turkey & Ham","Pizza Sub","Roast Beef","Spicy Italian","Steak & Cheese","Subway Club","Subway Melt","Sweet Onion Chicken Teriyaki","Tuna","Turkey Breast","Veggie Delite")
+
+sides <- c("Fries","Sweet Potato Fried","Caramel Cookie","Chocolate Chip Cookie","Oatmeal Raisin Cookie","White Chip Macadamia Nut Cookie","Dark Chocolate Cherry Cookie","Broccoli Soup","Chicken Noodle Soup","Broccoli Cheddar Soup","Cheese Flatizza","Pepperoni Flatizza","Spicy Italian Flatizza","Veggie Flatizza")
+
+drinks <- c("Coffee","Fountain Drinks","Dasani Water","X2 All Natural Energy","Gatorade","Honest Kids","Bootle Beverage","Low Fat Milk","Juice")
+
+# Define all prices
+sandwich_price <- c(7,8,8.3,8.55,8.75,9.75)
+side_price <- c(3.25,3.45,4,4.35,4.5,4.95)
+drinks_price <- c(2,2.25,2.5,3,3.5,3.75)
+item_prices <- c(sample(sandwich_price,length(sandwiches),replace=TRUE),
+sample(side_price, length(sides), replace=TRUE),
+sample(drinks_price, length(drinks), replace=TRUE))
+
+# Define item description
+all_items <- c(sandwiches, sides, drinks)
+
+items <- data.frame(
+  storeid = sample(150, size=42, replace = FALSE),
+  item_favorite = all_items,
+  item_price = item_prices,
+  stocklevel = sample(c("FULL", "EMPTY"), size = 42, replace=TRUE) |> as.factor(),
+  item_numer = sample(1:42, size=42, replace = FALSE),
+  customer_rating = round(rnorm(42, mean = 4, sd = 0.5),2)
+)
+
+# Outliers
+items$customer_rating[sample(1:nrow(items), 5)] <- round(rnorm(5, mean=1, sd=0.5),2)
+items$customer_rating[sample(1:nrow(items), 3)] <- NA
+head(items)
+```
+
+Let's introduce some correlated data:
+
+```{r}
+# Revenue correlated to staff
+stores <- stores |> 
+  mutate(revenue = revenue + (staff * 2000))
+
+# Happy score correlated to age
+staff <- staff |> 
+  mutate(happy_score = round(runif(1,0,1) * age))
+```
+
+
+```{r}
+# Correlation
+par(mfrow = c(1,2))
+plot(stores$staff, stores$revenue, main="Corr. Revenue vs. Staff",
+     ylab = "Revenue", xlab = "Staff")
+plot(staff$happy_score, staff$age, main="Corr. Age vs. Happy Score",
+     xlab = "Happy Score", ylab = "Age")
+```
+
+```{r}
+# Check the correlation
+cor(stores$staff, stores$revenue, use = "complete.obs")
+cor(staff$happy_score, staff$age, use = "complete.obs")
+```
+
+The correlation is almost perfectly positive between `staff` and `revenue`, `happy_score` and `age`.
+
+## Merge
+
+Let's merge our datasets into one.
+
+
+```{r}
+# Check intersecting column names we might be able to merge on
+intersect(staff |> names(), stores |> names())
+
+# store_id also in dataframe `items`?
+"store_id" %in% items |> names()
+
+# What columns could be close?
+names(items)
+
+# Let's merge on store_id and storeid
+df <- stores |> left_join(staff, by = "store_id") |> 
+  left_join(items, by = c("store_id" = "storeid"))
+```
+
+
+```{r}
+# Let's check if it all worked
+df |> group_by(store_id) |> 
+  dplyr::select(profitability, suburb, item_favorite) |>
+  arrange(store_id) |> 
+  head(3)
+```
+
+It looks like it works but not each store has an item_favorite. 
+
+```{r}
+# Let's check if our dataframe has factor types
+factor_col = list()
+for (col in names(df)){
+  if (is.factor(df[[col]]) == TRUE){
+    factor_col <- append(factor_col, col)}
+}
+
+factor_col
+```
+
+## Understand 
+
+This section is the EDA of the data to understand what data manipulation or preprocessing steps are necessary. Let's work on a copy of our data.
+
+
+```{r}
+# This is a chunk where you inspect the types of variables, data structures, check the attributes in the data and apply proper data type conversions
+# Check the variable types
+copy <- df
+str(copy)
+```
+
+Let's fix some data types:
+
+```{r}
+# Rename customer_rating.x and customer_rating.y
+copy <- copy |> 
+  rename(
+    rating_category = customer_rating.x,
+    rating_score = customer_rating.y,
+    item_nummer = item_numer
+  )
+
+# Staff_id should be numeric
+copy$staff_id <- copy$staff |> as.numeric()
+copy$age <- copy$age |> as.integer()
+copy$happy_score |> as.integer()
+# Customer_rating and profitability a factor
+copy$profitability <- copy$profitability |> factor(levels = c("Very low", "Low", "Medium", 
+                                         "Somewhat High", "High", "Very High"),
+                             ordered = TRUE)
+```
+
+Let's also inspect `rating_category`:
+
+```{r}
+# Let's inspect rating_categorry
+copy$rating_category |> unique()
+```
+
+```{r}
+# Let's change the strings to style 'title'
+copy$rating_category <- str_to_title(copy$rating_category)
+copy$rating_category |> unique()
+```
+
+```{r}
+# Let's fix the typos
+copy$rating_category[copy$rating_category %in% c("God")] <- "Good"
+copy$rating_category[copy$rating_category %in% c("Imbrofable")] <- "Improvable"
+copy$rating_category[copy$rating_category %in% c("Aaverage")] <- "Average"
+copy$rating_category[copy$rating_category %in% c("Pop", "Pobular")] <- "Popular"
+
+# Let's check the result
+copy$rating_category |> unique()
+```
+
+```{r}
+# Let's change the type now
+copy$rating_category <- copy$rating_category |> factor(
+  levels = c("Improvable", "Average", "Good", "Popular"),
+  ordered = TRUE)
+```
+
+Let's look at the numeric variables only:
+
+```{r}
+# Subset
+num_copy <- copy |> dplyr::select(where(is.numeric))
+summary(num_copy)
+```
+
+The `summary` statistic is already revealing some skewness in the data, especially in columns `happy_score`, `customer_rating`. `store_id` seems correct - evenly spread out from 1 to 150.
+`age` doesn't make any sense, the maximum age is 150.
+
+```{r}
+# Fix the age
+copy |> group_by(age) |> count() |> arrange(desc(age))
+```
+
+```{r}
+# Change the age
+copy$age[copy$age %in% 150] <- median(copy$age)
+```
+
+Let's verify the distribution of each numeric variable:
+
+```{r}
+# Display 3x3 plots
+par(mfrow = c(3,3))
+for (col in names(num_copy)){
+  hist(copy[[col]], main = glue::glue("Column {col}"), breaks = 15,xlab = NULL)}
+```
+
+##	Manipulate Data 
+
+Our data is now almost cleaned up. Let's do some feature engineering to improve future machine learning algorithms:
+
+
+```{r}
+# Revenue by head count
+copy <- copy |> mutate(
+  revenue_per_head = round(revenue / staff,2))
+
+# Result
+head(copy)
+```
+
+##	Scan I 
+
+Let's display all missing values:
+
+
+```{r}
+# Total rows
+glue::glue("Total rows: {nrow(copy)}\n\n")
+# Total missing values
+print("Total missing values per column:")
+colSums(is.na(copy))
+```
+
+```{r}
+# Display the NaN rows
+copy_nan <- copy |> dplyr::select(email, item_favorite, item_price, stocklevel, item_nummer, rating_score)
+head(copy_nan)
+```
+
+Let's fix the missing emails first. We need the first name + '.' + last name. We will use the most used email provider to complete the gap. (This is just for test purposes, in real life we wouldn't just assume email addresses.)
+
+```{r}
+# Email
+copy |> dplyr::select(first_name, last_name, email)
+
+# Let's get the most used email provider
+email_provider = str_extract(copy$email, pattern = "@[a-z]+.com")
+table(email_provider)
+```
+
+```{r}
+# Impute missing email addresses
+all_na_email <- length(copy$email[is.na(copy$email)]) # total missing rows
+na_idx <- is.na(copy$email) # indices of all missing emails
+
+copy$email[is.na(copy$email)] <- glue::glue(
+  "{copy$first_name[na_idx]}.{copy$last_name[na_idx]}@{sample(
+    c('fastmail.com', 'gmail.com', 'gmx.com'),
+    all_na_email,
+    replace = TRUE
+  )}"
+)
+
+sum(is.na(copy$email))
+```
+
+```{r}
+# Change all other variables to "Unknown" - as we can't make up items
+na_columns <- list("item_favorite","item_price","stocklevel","item_nummer","rating_score")
+
+for (col in na_columns) {
+  if (is.factor(copy[[col]])) {
+    levels(copy[[col]]) <- c(levels(copy[[col]]), "Unknown")
+  }
+  copy[[col]][is.na(copy[[col]])] <- "Unknown"
+}
+
+# Check
+colSums(is.na(copy))
+```
+
+
+##	Scan II
+
+In Scan II , we will check if any outliers exist.
+
+
+```{r}
+# Boxplot for outlier detection
+num_copy <- copy |> select_if(is.numeric)
+
+par(mfrow = c(3,3))
+for (col in names(num_copy)){
+  boxplot(num_copy[[col]], main = col)
+}
+
+
+```
+
+`happy_score` and `revenue_per_head` both contain outliers:
+
+```{r}
+copy |> dplyr::select(happy_score, revenue_per_head) |> summary()
+```
+
+`Summary()` already discloses that `47` will be an outlier in `happy_score`. Let's filter all outliers which are consider all values smaller than the 25th quantile minus 1.5 multiplied by the interquartile range (75th quantile minus 25th quantile) and bigger than the 75th quantile plus 1.5 multiplied by the interquartile range.
+
+```{r}
+# Filter the outliers for happy_score
+q1 <- quantile(copy$happy_score, 0.25)
+q3 <- quantile(copy$happy_score, 0.75)
+iqr <- q3 - q1
+
+lower <- q1 - 1.5 * iqr
+upper <- q3 + 1.5 * iqr
+
+condition <- copy$happy_score < lower | copy$happy_score > upper
+outliers_happy_score <- copy$happy_score[condition]
+outliers_happy_score
+```
+
+This value looks like a data entry error and must be taken care of. One solution is to impute all those outliers with the variables mean or median value.
+
+```{r}
+# Let's filter the outliers for revenue_per_head
+q1 <- quantile(copy$revenue_per_head, 0.25)
+q3 <- quantile(copy$revenue_per_head, 0.75)
+iqr <- q3 - q1
+
+lower <- q1 - 1.5 * iqr
+upper <- q3 + 1.5 * iqr
+
+outliers_rev_per_head <- copy$revenue_per_head[copy$revenue_per_head < lower |
+                                                 copy$revenue_per_head > upper]
+
+outliers_rev_per_head
+```
+
+Looking at the histogram of `revenue_per_head` and all outliers it doesn't look like those values are an error and some stores are just standing out in terms of revenue per staff member. No data preprocessing will be needed here.
+
+Another way of displaying outliers is by calculating the z-score and filtering all values lower than 3 standard deviations or bigger than 3 standard deviations:
+
+```{r}
+# happy_score z-scores
+z_scores <- outliers::scores(copy$happy_score, type = "z")
+summary(z_scores)
+```
+
+```{r}
+# Histogram
+hist(z_scores, breaks = 15, main = "Z-Scores Amount", freq = FALSE)
+x <- seq(-15,15,by=0.001)
+lines(x=x, y=dnorm(x), col='red')
+```
+
+Let's fix the happy_score outliers:
+
+```{r}
+# fixing happy_score
+copy$happy_score[condition] <- median(copy$happy_score)
+summary(copy$happy_score)
+```
+
+
+```{r}
+# New histogram
+hist(copy$happy_score, main = "Histogram of Happy Score", xlab = NULL)
+```
+
+The distribution is now a bit more uniform, all outliers are gone.
+
+##	Transform 
+
+Let's looks at the shape of our data again. 
+
+```{r}
+num_copy <- copy |> select_if(is.numeric) # Get the numeric values again
+# Display the distribution
+par(mfrow = c(3,3))
+for (col in names(num_copy)){
+  hist(num_copy[[col]], main = col, breaks = 15)
+}
+```
+
+Our variables `happy_score` and `revenue_per_head` will both need transformation. We can apply a logarithmic transformation since both variables are right-skewed:
+
+```{r}
+# transformation
+copy$revenue_per_head <- log10(copy$revenue_per_head)
+copy$happy_score <- log(copy$happy_score)
+
+par(mfrow = c(1,2))
+hist(copy$revenue_per_head, main = "Revenue per head", xlab=NULL)
+hist(copy$happy_score, main = "Happy Score", xlab=NULL)
+```
+
+In this instance we do not have any left-skewed data, if we did, we could use a power transformation or boxcox transformation. Let's apply a boxcox transformation on `revenue` even though the variable is already meeting the assumption of normality:
+
+```{r}
+# Testing normality
+shapiro.test(copy$revenue)
+```
+Since 
+
+## Summary statistics
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk where you produce summary statistics.
+
+```
+
+
+
+<br>
+<br>

@@ -21,6 +21,7 @@ library(here)
 ```{r,echo=TRUE}
 # Get the current location
 getwd()
+
 # Standard R function
 iris1 <- read.csv(here('ZDatasets','iris.csv'), stringsAsFactors = TRUE) # Will read factors as <fctr>
 head(iris1, n = 5)

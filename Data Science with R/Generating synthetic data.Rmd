@@ -99,10 +99,3 @@ shapiro.test(nom1)
 Is our significance level 5% (0.05), we would fail to reject the Null Hypothesis and our data is normally distributed.
 
 
-
-
-
-
-
-
-
