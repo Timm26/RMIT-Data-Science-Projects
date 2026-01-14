@@ -1,0 +1,312 @@
+---
+title: "Data Wrangling Assessment Task 3: Dataset challenge"
+author: "Insert student name and number here"
+subtitle: 
+output: 
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf: default
+---
+If you have any questions regarding the assignment instructions and the R Markdown template, please post it on the discussion board **Questions on completing Assessment 3.**  
+
+
+## Setup 
+
+Insert and load the packages you need to produce the report here:
+```{r}
+# This is a chunk where you can load the packages required for producing the report
+library(tidyverse)
+
+```
+
+
+## Instructions
+Follow the instructions given in the Assessment brief to fill out the template below. Remember to include R codes and outputs and explain your working and results in plain text.
+
+
+## Data Description 
+
+Write your plain text here. 
+
+Our finalised first dataset sales_data contains the variables:
+
+- town: Name of the Connecticut town the property is located
+- listyear: Year of the properties listing date
+- daterecorded: Date when the sale was recorded
+- assessedvalue: Assessed Value of the property
+- saleamount: Price at which the property was sold
+- salesratio: Ratio that compares sale price to assessed value
+- propertytype: Type of the Property
+- residentialtype: Type of the Residence
+
+
+```{r}
+# Import the necessary data
+url <- "https://data.ct.gov/resource/5mzw-sjtu.json"
+df <- RSocrata::read.socrata(url)
+dim(df)
+```
+
+Since our data contains over 1.1 millionen rows, we will subset 10000 randomly. We will slice our dataset down so that each town is only represented once.
+
+```{r}
+# Subset 10000 rows
+copy <- df |> slice_sample(n = 10000)
+# Let's subset
+copy <- copy |> group_by(town) |> slice(1)
+head(copy)
+```
+
+```{r}
+# Let's further understand the structure of our data
+glimpse(copy)
+```
+
+```{r}
+# Let's check if any variables do not contain any data
+colSums(is.na(copy))
+```
+
+`opm_remarks` has 168 out of 169 missing values and `remarks` 142 out of 169, `geo_coordinates.type` and `nonusecode` are also full of missing values. Let's drop those variables as they don't add any value to our dataset:
+
+```{r}
+# Let's drop those variables
+data_sales <- copy |> dplyr::select(-c(remarks, opm_remarks, geo_coordinates.type, nonusecode))
+names(data)
+```
+
+Let's continue our feature selection by removing variables which don't add any value like `address` or `serialnumber`. Our analysis wouldn't benefit from this extra bit of information and unnecessary data is just slowing down the analysis computationally.
+
+```{r}
+data_sales <- data_sales |> dplyr::select( -c(address, serialnumber))
+# Final dataset
+head(data_sales)
+```
+
+Great. Let's import the second dataset now:
+
+- town: Name of the town
+- X_2010_census: Population of the town 2010
+- gov_assisted: Number of government-assisted housing units
+- tenant_rental_assistance: Rental units receiving rental assistance
+- chfa_usda_mortgages: Housing units financed through CHFA (Connecticut Housing Finance
+  Authority) or USDA (United States Department of Agriculture) mortgages
+- total_assisted: Total number of assisted housing units in the town.
+
+
+```{r}
+url <- "https://data.ct.gov/resource/3udy-56vi.json"
+data_housing <- RSocrata::read.socrata(url)
+dim(data_housing)
+head(data_housing)
+```
+
+Let's also here only include the first town to avoid importing unnecessary columns:
+
+```{r}
+# Slice the data
+data_housing <- data_housing |> group_by(town) |> slice(1) |> ungroup() |> 
+  dplyr::select(town, everything(), -c(year, code, percent_assisted, deed_restricted))
+head(data_housing)
+```
+
+Let's import dataset number 3:
+
+- town: Represents the town
+- gini_index_2010: The Gini Index for the year 2010
+- gini_index_2015: The Gini Index for the year 2015
+- gini_index_2020: The Gini Index for the year 2020
+
+
+```{r}
+# Third dataset
+url <- "https://data.ct.gov/resource/5e73-kfqf.json"
+data_house_segregation <- RSocrata::read.socrata(url)
+data_house_segregation |> group_by(sub_geography) |> count() |> head()
+```
+
+Let's get rid off the first 12 rows as they are repeating the same sub_geography. Let's also rename this variable as we will later merge the other variables on this one.
+
+```{r}
+# Rename and select necessary columns
+data_house_segregation <- data_house_segregation |> 
+  rename(town = sub_geography) |> 
+  dplyr::select(town, everything(), -geography) |> 
+  slice(-c(1:12)) |> 
+  arrange(town)
+# Display the result
+head(data_house_segregation)
+```
+
+Let's continue with dataset number 4 - which is about the number of housing permits issued in various towns across different years. Again, we will need to rename towns to `town`:
+
+This dataset contains various columns like:
+
+- town : Name of the town
+- X_1990 to X_2022 : Number of housing permits issued in the year
+- county : Name of the county where the town is located
+
+```{r}
+# Get the data
+url <- "https://data.ct.gov/resource/stm9-38x4.json"
+data_permits <- RSocrata::read.socrata(url)
+dim(data_permits)
+head(data_permits)
+```
+
+
+```{r}
+# Let's rename the column and drop the last variable
+data_permits <- data_permits |> slice(-1) |> # drops the first row
+  rename(town = towns) |>
+  arrange(town)
+
+head(data_permits)
+```
+
+This dataset doesn't look right. One feature is covering multiple columns - we will need to fix this by changing the dataset to a long format:
+
+```{r}
+data_permits <- pivot_longer(data_permits,
+             cols = starts_with("X_"),
+             names_to = "year",
+             names_prefix = "X_",
+             values_to = "permits")
+
+head(data_permits)
+```
+
+Let's generate a new column `total_permits` so we have one number per town:
+
+```{r}
+# Generate two new columns total_permits and peak_year
+data_permits <- data_permits |> group_by(town, county) |> 
+  summarise(total_permit = sum(as.numeric(permits), na.rm = TRUE),
+            peak_year = year[which.max(permits)]) |> 
+  ungroup() |> 
+  arrange(town)
+
+head(data_permits)
+```
+
+Finally, let's import the last dataset which contains information about various types of property net values in different towns.
+
+```{r}
+# Get the data
+url <- "https://data.ct.gov/resource/8rr8-a322.json"
+data_prop_type <- RSocrata::read.socrata(url)
+data_prop_type <- data_prop_type[, c(2,4,7,10,13,22)]
+dim(data_prop_type)
+head(data_prop_type)
+```
+
+THe dataset seems to be in wide format as well where each column is a property_type. Let's subset all property types:
+
+```{r}
+# Reshape the data to long format
+data_prop_type <- data_prop_type |> 
+  pivot_longer(cols=c(residential_net,apartments_net,cip_net,vacant_net,
+                      total_real_property),
+             names_to = "type_property",
+             values_to = "value_property")
+
+head(data_prop_type)
+```
+
+```{r}
+# Add a new column for the average property value
+data_prop_type <- data_prop_type |> group_by(town_name) |> 
+  summarise(avg_property = mean(as.numeric(value_property), na.rm = TRUE)) |>
+  ungroup() |> 
+  rename(town = town_name)
+
+head(data_prop_type)
+```
+
+
+```{r}
+# Identify the common varibale between all tables
+common_var <- intersect()
+common_var
+```
+
+
+## Understand 
+
+Write your plain text here.
+
+
+```{r}
+
+```
+
+
+
+##	Tidy & Manipulate Data I 
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk where you check whether the data conforms to the tidy data principles and reshape your data into a tidy format
+
+```
+
+##	Tidy & Manipulate Data II 
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk where you create/mutate at least one variable from existing variables
+
+```
+
+##	Scan I 
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk where you scan the data for missing values, inconsistencies and obvious errors
+
+```
+
+##	Scan II
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk where you scan the numeric data for outliers 
+
+```
+
+
+##	Transform 
+
+Write your plain text here.
+
+
+```{r}
+
+# This is a chunk where you apply an appropriate transformation to at least one of the variables
+
+```
+
+
+## Reflective journal
+
+Write your plain text here.
+
+## Presentation link
+
+Include the link to your video walkthrough here. 
+
+<br>
+<br>
