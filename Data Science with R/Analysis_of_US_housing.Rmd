@@ -44,7 +44,7 @@ Our finalised first dataset sales_data contains the variables:
 ```{r}
 # Import the necessary data
 url <- "https://data.ct.gov/resource/5mzw-sjtu.json"
-df <- RSocrata::read.socrata(url)
+# df <- RSocrata::read.socrata(url)
 dim(df)
 ```
 
@@ -73,7 +73,7 @@ colSums(is.na(copy))
 ```{r}
 # Let's drop those variables
 data_sales <- copy |> dplyr::select(-c(remarks, opm_remarks, geo_coordinates.type, nonusecode))
-names(data)
+names(data_sales)
 ```
 
 Let's continue our feature selection by removing variables which don't add any value like `address` or `serialnumber`. Our analysis wouldn't benefit from this extra bit of information and unnecessary data is just slowing down the analysis computationally.
@@ -227,20 +227,101 @@ head(data_prop_type)
 
 ```{r}
 # Identify the common varibale between all tables
-common_var <- intersect()
+common_var <- intersect(data_sales |> names(), data_housing |> names())
+common_var <- intersect(common_var, data_house_segregation |> names())
+common_var <- intersect(common_var, data_permits |> names())
+common_var <- intersect(common_var, data_prop_type |> names())
 common_var
 ```
 
+We can merge all our datasets on their common variable `town`:
+
+```{r}
+data1 <- data_sales |> 
+  left_join(data_housing, by = c("town")) |> 
+  left_join(data_house_segregation, by = c("town")) |> 
+  left_join(data_permits, by = c("town")) |> 
+  left_join(data_prop_type, by = c("town")) |> dplyr::select(town, everything()) |> ungroup()
+head(data1) # Final dataset
+
+# Let's create a new copy
+data <- data1
+```
+
+Great. We can now start with our explanatory data analysis on our final dataset `data`.
 
 ## Understand 
 
-Write your plain text here.
-
+Let's check if all column names are correct:
 
 ```{r}
-
+# Checking column names
+colnames(data)
 ```
 
+Let's rename all the variables for easier understanding of what values they represent. We will also check if each variable is in the right data type.
+
+```{r}
+data <- data |> rename(
+  "Listed year" = listyear,
+  "Recorded date" = daterecorded,
+  Town = town,
+  "Assessed value" = assessedvalue,
+  "Sale amount" = saleamount,
+  "Sale ratio" = salesratio,
+  "Geo. coords" = geo_coordinates.coordinates,
+  "Property type" = propertytype,
+  "Residential type" = residentialtype,
+  "Census 2010" = X_2010_census,
+  "Gov. assisted" = gov_assisted,
+  "Rental assistance" = tenant_rental_assistance,
+  "Financed units" = chfa_usda_mortgages,
+  "Total assisted" = total_assisted,
+  "Gini 2010" = gini_index_2010,
+  "Gini 2015" = gini_index_2015,
+  "Gini 2020" = gini_index_2020,
+  County = county,
+  "Total permits" = total_permit,
+  "Peak year" = peak_year,
+  "Avg. property" = avg_property
+)
+# Fixed colnames - let's check if the type is correct
+glimpse(data)
+```
+
+We can see that a lot of numerical variables are currently formatted as characters. `Listed year`, `Property type`, `Residential type` should also be of type factor:
+
+```{r}
+# All numeric values
+num_data <- c("Listed year", "Assessed value", "Sale amount", "Sale ratio", "Census 2010", "Gov. assisted",
+              "Rental assistance", "Financed units", "Total assisted", "Gini 2010", "Gini 2015", "Gini 2020",
+              "Total permits", "Peak year", "Avg. property")
+
+# Fix all numeric variables
+for (col in num_data){
+  data[[col]] <- data[[col]] |> as.numeric()
+}
+
+# Fix all factor variables
+fac_data <- c("Listed year", "Property type", "Residential type")
+for (col in fac_data){
+  data[[col]] <- data[[col]] |> as.factor()
+}
+
+# Let's check if the types are all fixed
+glimpse(data)
+```
+
+Let's now check if our factor variables any faulthy categories:
+
+```{r}
+# Check the levels of each factor
+for (col in fac_data){
+  cat(glue::glue("{col}:\n{toString(unique(data[[col]]))}\n\n\n"))
+}
+```
+
+We are still facing missing data but all categories seem correct and make sense. We can now proceed with the data preprocessing.
 
 
 ##	Tidy & Manipulate Data I 
