@@ -11,7 +11,7 @@ set.seed(123)
 
 # Step 1. Dateset
 
-Since real data of different carriers here in Australia aren't publicy available (without breaking privacy laws) - I will create a syntethic dataset of carrier for our contract logistics firm that is highly inspired by data I have found online. Our dataset has the following columns:
+Since real data of different carriers here in Australia aren't publicly available (without breaking privacy laws) - I will create a synthetic data set of carrier for our contract logistics firm that is highly inspired by data I have found online. Our data set has the following columns:
 
 - carrier_id: The identification number a carrier
 - month: Month of when data was captured
@@ -29,33 +29,11 @@ Since real data of different carriers here in Australia aren't publicy available
 - Time: Month when data was captured
 - Weather: Average weather condition
 
-The below creates the dataset, it will have 2000 entries (rows) and 9 different attributes (columns):
+The below creates the dataset will contain 120 carrier-month observations and 12 columns/ attributes/ features.
 
 ```{r}
-# Dataset attributes
 n_carriers = 20
 
-# Creates the simulated dataset
-carrier_df <- data.frame(
-  carrier_id = c(1,2,3),
-  month = c(1,2,3),
-  origin_state = c(1,2,3),
-  destination_state = c(1,2,3),
-  lane_distance_km = c(1,2,3),
-  lane_type = c(1,2,3),
-  price_per_shipment = c(1,2,3),
-  on_time_rate = c(1,2,3),
-  damage_rate = c(1,2,3),
-  avg_transit_days = c(1,2,3),
-  fleet_size = c(1,2,3),
-  review_score = c(1,2,3)
-)
-
-carrier_df
-
-```
-
-```{r}
 # COLUMN 1 : carrier_id : Create the dataframe and the carrier_id column
 carrier <- data.frame(
   carrier_id = paste("Carrier_", sprintf("%02d", 1:n_carriers)))
@@ -78,7 +56,7 @@ carrier |> head(3) # check result
 ```{r}
 # COLUMN 3 : origin_state : Add origin_state - (mainly) 80% VIC / 10% ACT / 5% SA and 5% NSW
 all_origin_states = c("VIC", "SA", "ACT", "NSW")
-all_origin_states_prop = c(0.75, 0.1, 0.15, 0.1)
+all_origin_states_prop = c(0.7, 0.09, 0.14, 0.07)
 
 carrier_origin <- tibble(
   carrier_id = paste("Carrier_", sprintf("%02d", 1:n_carriers)),
@@ -107,8 +85,8 @@ carrier |> dplyr::slice_sample(prop=1) |> head(3) # check result
 
 
 ```{r}
-# COLUMN 5 : lane_distance_km : How far awway was the delivery from Tullamarine VIC?
-## Create a lookup table for all states - their base km distance from Tullamarine - and the 
+# COLUMN 5 : lane_distance_km : How far away was the delivery from Tullamarine VIC?
+## Create a look-up table for all states - their base km distance from Tullamarine - and the 
 ## additional km that can occur in that state (E.g. Albury NSW is 320km but Moorebank NSW 820km)
 distance_lookup <- tibble(
   destination_state = all_destination_states,
@@ -116,7 +94,7 @@ distance_lookup <- tibble(
   extra_km_max = c(370, 370, 70, 900, 1000, 1200, 1000, 200)
 )
 
-## Add distance_lookup to our carrier dataset while keeping the distances in mind
+## Add distance_lookup to our carrier data set while keeping the distances in mind
 carrier <- carrier |> left_join(distance_lookup, by = 'destination_state') |> 
   mutate(lane_distance_km = round(base_km + runif(n(), 0, extra_km_max), 0)) |> 
   dplyr::select( -c(base_km, extra_km_max))
@@ -162,10 +140,10 @@ carrier <- carrier |> mutate(
 #   max_price = max(price_per_shipment),
 #   mean_price = mean(price_per_shipment))
 # 
-# # What trip was the cheapest delivery in our dataset?
+# # What trip was the cheapest delivery in our data set?
 # carrier |> filter(price_per_shipment == min(price_per_shipment))
 # 
-# # What is the relationship between lane distance in km and price per shipments? Are there any unrealstic deliveries? 
+# # What is the relationship between lane distance in km and price per shipments? Are there any unrealistic deliveries? 
 # ## Outcome: NO
 # ggplot(carrier, aes(x=lane_distance_km, y=price_per_shipment)) + 
 #   geom_line()
@@ -189,17 +167,17 @@ carrier_performance <- carrier |>
 carrier_performance <- carrier_performance |> 
   mutate(
     mean_lane_distance_scaled = 
-      (carrier_performance$mean_lane_distance - min(carrier_performance$mean_lane_distance)) / 
-      (max(carrier_performance$mean_lane_distance) - min(carrier_performance$mean_lane_distance)),
+      (mean_lane_distance - min(mean_lane_distance)) / 
+      (max(mean_lane_distance) - min(mean_lane_distance)),
     
     mean_price_per_shipment_scaled = 
-      (carrier_performance$mean_price_per_shipment - min(carrier_performance$mean_price_per_shipment)) /
-      (max(carrier_performance$mean_price_per_shipment) - min(carrier_performance$mean_price_per_shipment))
+      (mean_price_per_shipment - min(mean_price_per_shipment)) /
+      (max(mean_price_per_shipment) - min(mean_price_per_shipment))
     ) |> 
   select(
     carrier_id, mean_lane_distance_scaled, mean_price_per_shipment_scaled)
 
-carrier_performance |> head(3) # Shows the first 4 carrier with scaled distance and price
+carrier_performance |> head(3) # Shows the first 3 carrier with scaled distance and price
 ```
 
 ```{r}
@@ -209,11 +187,12 @@ carrier <- carrier |> left_join(carrier_performance, by = "carrier_id") |> mutat
     0.80 + # base line percent points 80% reliable
     0.08 * (1 - mean_lane_distance_scaled) + # we weight distance twice as much as 
     0.04 * (1 - mean_price_per_shipment_scaled) + # we weight price
-    rnorm(n(), mean = 0, sd = 0.02), # add some randomess to the performance/ month
-  on_time_rate = round(on_time_rate*100, 2)) |> 
+    rnorm(n(), mean = 0, sd = 0.02), # add some randomness to the performance/ month
+  on_time_rate = pmin(pmax(on_time_rate, 0.75), 0.99),
+  on_time_rate = round(on_time_rate*100, 2)) |>
   select(-c(mean_price_per_shipment_scaled))
 
-# # Sanity check if performance is realtistic - min 76%, max 96% and average 85.5%
+# # Sanity check if performance is realistic - min 76%, max 96% and average 85.5%
 # carrier |> group_by(carrier_id) |> 
 #   summarise(
 #   min = min(on_time_rate),
@@ -229,15 +208,14 @@ carrier |> dplyr::slice_sample(prop=1) |>  head(4) # inspect data
 
 
 ```{r}
-# COLUMN 9 : damage_rate : Percentage of occuring damages
+# COLUMN 9 : damage_rate : Percentage of occurring damages
 carrier <- carrier |> mutate(
   damage_rate = 
     0.01 + # base damage rate of 1%
     0.03 * mean_lane_distance_scaled + # distance increases risk
     rnorm(n(), mean = 0, sd = 0.005), # random operational noise
   # clamp our results to a minimum of 0.2% (for excellent carrier) and 5% (for bad ones)
-  damage_rate = round(pmin(pmax(damage_rate, 0.002), 0.05) * 100, 4)) |> # multipled by 100 to represent actual percentage points
-  select( -c(mean_lane_distance_scaled)) # drop the variable
+  damage_rate = round(pmin(pmax(damage_rate, 0.002), 0.05) * 100, 4)) # multiplied by 100 to represent actual percentage points
 
 # # Sanity check if values are realistic
 # carrier |> group_by(carrier_id) |> 
@@ -249,7 +227,7 @@ carrier |> slice_sample(prop = 1) |> head(4)
 
 
 ```{r}
-# COLUMN 10 : avg_transit_days
+# COLUMN 10 : avg_transit_days : Average transit days per carrier per month
 carrier <- carrier |> mutate(
   avg_transit_days =
     0.7 + # our base handling time 0.7 days
@@ -262,6 +240,48 @@ carrier |> slice_sample(prop = 1) |> head(3)
 ```
 
 
+```{r}
+# COLUMN 11 : fleet_size : How many trucks does the carrier own
+fleet_size_categories = c("3-5", "6-8", "9-11", ">11")
+fleet_size_prop = c(0.125, 0.45, 0.35, 0.075)
+
+carrier_fleet <- carrier_performance |>
+  rowwise() |> 
+  mutate(
+    fleet_size = case_when(
+      mean_lane_distance_scaled > 0.7 ~ 
+        sample(c("9-11", ">11"), 1, replace = TRUE, prob = c(0.7, 0.3)),
+      mean_lane_distance_scaled < 0.3 ~ 
+        sample(c("3-5", "6-8"), 1, replace = TRUE, prob = c(0.6, 0.4)),
+      TRUE ~ 
+        sample(fleet_size_categories, 1, replace = TRUE, prob = fleet_size_prop))) |> 
+  select(carrier_id, fleet_size)
+
+# Join the tables like before
+carrier <- carrier |> left_join(carrier_fleet, by = "carrier_id") |> 
+  select(-mean_lane_distance_scaled) # We drop (delete) the column
+
+carrier |> slice_sample(prop = 1) |>  tail(3)
+```
+
+
+```{r}
+# COLUMN 12 : review_score : Average rating for that month
+carrier <- carrier |> mutate(
+  rating_score = 
+    3.8 + # base rating
+    1.5 * ((on_time_rate / 100) - 0.85) - # We normalise our on_time_rate around 0 by subtracting 0.85
+    2 * (damage_rate / 5) + # Same here
+    rnorm(n(), mean = 0, sd = 0.3),
+  rating_score = round(pmin(pmax(rating_score, 1), 5), 1))
+
+# # Sanity check - ratings are plausible and realistic
+# carrier |> group_by(carrier_id) |> summarise(
+#   min = min(rating_score), max = max(rating_score), avg = mean(rating_score))
+
+# THIS IS OUR FINAL DATA WE WILL BE WORKING WITH!!
+carrier |> slice_sample(prop = 1) |> head(10)
+```
 
 
 
